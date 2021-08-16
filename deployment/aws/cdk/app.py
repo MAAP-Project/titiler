@@ -12,6 +12,8 @@ from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda, core
 from config import StackSettings
 
+from permission_boundary import PermissionBoundaryAspect
+
 settings = StackSettings()
 
 if settings.mosaic_backend and settings.mosaic_host:
@@ -71,6 +73,16 @@ class titilerLambdaStack(core.Stack):
 
         for perm in permissions:
             lambda_function.add_to_role_policy(perm)
+        
+        policy_name = os.environ.get('MAAP_PERMISSIONS_BOUNDARY_POLICY')
+        if (policy_name):
+            self.node.apply_aspect(
+                PermissionBoundaryAspect(
+                    iam.ManagedPolicy.from_managed_policy_name(
+                        self, 'PermissionsBoundary', policy_name
+                    )
+                )
+            )
 
         api = apigw.HttpApi(
             self,
@@ -174,7 +186,7 @@ perms = []
 if settings.buckets:
     perms.append(
         iam.PolicyStatement(
-            actions=["s3:GetObject", "s3:HeadObject"],
+            actions=["s3:GetObject"],
             resources=[f"arn:aws:s3:::{bucket}/*" for bucket in settings.buckets],
         )
     )
@@ -182,7 +194,7 @@ if settings.buckets:
 if settings.mosaic_backend == "s3://" and settings.mosaic_host:
     perms.append(
         iam.PolicyStatement(
-            actions=["s3:GetObject", "s3:PutObject", "s3:HeadObject"],
+            actions=["s3:GetObject", "s3:PutObject"],
             resources=[f"arn:aws:s3:::{settings.mosaic_host}*"],
         )
     )
