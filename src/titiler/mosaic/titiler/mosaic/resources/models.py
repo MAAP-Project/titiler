@@ -1,12 +1,12 @@
 """Titiler.mosaic Models."""
 
-from cogeo_mosaic.mosaic import MosaicJSON
+import re
 from typing import List, Optional
 
-from stac_pydantic.api import Search
+from cogeo_mosaic.mosaic import MosaicJSON
 from pydantic import BaseModel, validator
+from stac_pydantic.api import Search
 
-import re
 
 def to_camel(snake_str: str) -> str:
     """
@@ -33,9 +33,12 @@ class MosaicEntity(BaseModel):
     links: List[Link]
 
 
-rfc3339_regex_str = r"^(\d\d\d\d)\-(\d\d)\-(\d\d)(T|t)" \
-                    r"(\d\d):(\d\d):(\d\d)(\.\d+)?(Z|([-+])(\d\d):(\d\d))$"
+rfc3339_regex_str = (
+    r"^(\d\d\d\d)\-(\d\d)\-(\d\d)(T|t)"
+    r"(\d\d):(\d\d):(\d\d)(\.\d+)?(Z|([-+])(\d\d):(\d\d))$"
+)
 rfc3339_regex = re.compile(rfc3339_regex_str)
+
 
 class StacApiQueryRequestBody(Search):
     """Common request params for MosaicJSON CRUD operations"""
@@ -82,6 +85,7 @@ class StacApiQueryRequestBody(Search):
         #             "Invalid datetime range, must match format (begin_date, end_date)"
         #         )
         return v
+
 
 class UrisRequestBody(BaseModel):
     # option 2 - a list of files and min/max zoom
