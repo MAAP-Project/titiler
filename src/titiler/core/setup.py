@@ -9,7 +9,7 @@ inst_reqs = [
     "fastapi>=0.65,<0.66",
     "geojson-pydantic",
     "jinja2>=2.11.2,<3.0.0",
-    "morecantile",
+    "morecantile>=2.1.4", # number of tilematrixsets changed in this version
     "numpy",
     "pydantic",
     "rasterio",
