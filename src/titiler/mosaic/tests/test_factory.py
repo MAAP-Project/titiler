@@ -43,7 +43,7 @@ def test_MosaicTilerFactory():
         optional_headers=[OptionalHeader.server_timing, OptionalHeader.x_assets],
         router_prefix="mosaic",
     )
-    assert len(mosaic.router.routes) == 30
+    assert len(mosaic.router.routes) == 33
     assert mosaic.tms_dependency == WebMercatorTMSParams
 
     app = FastAPI()
