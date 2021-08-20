@@ -47,7 +47,14 @@ from fastapi import Depends, Header, HTTPException, Path, Query
 
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette.status import *
+from starlette.status import (
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_405_METHOD_NOT_ALLOWED,
+    HTTP_409_CONFLICT,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 
 
 @dataclass
