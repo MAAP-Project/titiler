@@ -178,7 +178,7 @@ def test_MosaicTilerFactory():
 root = "http://testserver/mosaic"
 
 def get_link_by_rel(response_body: dict, rel: str) -> str:
-    return next((x["href"] for x in response_body["links"] if x["rel"] == rel), None)
+    return next((x["href"] for x in response_body["links"] if x["rel"] == rel), "")
 
 
 def test_mosaics_basic(set_env, client):
