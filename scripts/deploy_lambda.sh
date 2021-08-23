@@ -13,14 +13,15 @@ SUBPACKAGE_DIRS=(
 
 for PACKAGE_DIR in "${SUBPACKAGE_DIRS[@]}"
 do
-    pushd "./titiler/${PACKAGE_DIR}"
+    pushd "./src/titiler/${PACKAGE_DIR}"
     rm -rf dist
     python setup.py sdist
-    cp dist/*.tar.gz ../../deployment/aws/
+    cp dist/*.tar.gz ../../../deployment/aws/
     popd
 done
 
 cd deployment/aws
 cp ".env.${DEPLOY_ENV}" .env
 
-npm run cdk deploy "dynamic-tiler-lambda-${DEPLOY_ENV}"
+# add `-- -vvv` at the end of this command to debug
+npm run cdk deploy "${DEPLOY_ENV}-dynamic-tiler-lambda" -- -vvv

@@ -184,7 +184,7 @@ if settings.buckets:
 if settings.mosaic_backend == "s3://" and settings.mosaic_host:
     perms.append(
         iam.PolicyStatement(
-            actions=["s3:GetObject", "s3:PutObject", "s3:HeadObject"],
+            actions=["s3:GetObject", "s3:PutObject"],
             resources=[f"arn:aws:s3:::{settings.mosaic_host}*"],
         )
     )
@@ -235,7 +235,7 @@ titilerECSStack(
     environment=settings.env,
 )
 
-lambda_stackname = f"{settings.name}-lambda-{settings.stage}"
+lambda_stackname = f"{settings.stage}-{settings.name}-lambda"
 titilerLambdaStack(
     app,
     lambda_stackname,
