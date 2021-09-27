@@ -10,6 +10,8 @@ from aws_cdk import aws_ecs as ecs
 from aws_cdk import aws_ecs_patterns as ecs_patterns
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda, core
+from permission_boundary import PermissionBoundaryAspect
+
 from config import StackSettings
 
 settings = StackSettings()
@@ -80,6 +82,16 @@ class titilerLambdaStack(core.Stack):
             ),
         )
         core.CfnOutput(self, "Endpoint", value=api.url)
+
+        policy_name = os.environ.get('MAAP_PERMISSIONS_BOUNDARY_POLICY')
+        if (policy_name):
+            self.node.apply_aspect(
+                PermissionBoundaryAspect(
+                    iam.ManagedPolicy.from_managed_policy_name(
+                        self, 'PermissionsBoundary', policy_name
+                    )
+                )
+            )
 
 
 class titilerECSStack(core.Stack):
