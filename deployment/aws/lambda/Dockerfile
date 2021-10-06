@@ -19,3 +19,7 @@ RUN rm -rdf /var/task/numpy/doc/
 RUN rm -rdf /var/task/uvicorn
 
 COPY lambda/handler.py /var/task/handler.py
+
+RUN mkdir "/asset-output"
+
+CMD ["echo", "hello world"]
