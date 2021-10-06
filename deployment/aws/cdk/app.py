@@ -44,7 +44,17 @@ class titilerLambdaStack(core.Stack):
         **kwargs: Any,
     ) -> None:
         """Define stack."""
+        policy_name = os.environ.get('MAAP_PERMISSIONS_BOUNDARY_POLICY')
+
         super().__init__(scope, id, *kwargs)
+
+        if (policy_name):
+            boundary = iam.ManagedPolicy.from_managed_policy_name(
+                self,
+                'Boundary',
+                settings.permissions_boundary_name
+            )
+            iam.PermissionsBoundary.of(self).apply(boundary)
 
         permissions = permissions or []
         environment = environment or {}
