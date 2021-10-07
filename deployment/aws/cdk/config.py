@@ -89,6 +89,8 @@ class StackSettings(pydantic.BaseSettings):
     mosaic_host: str
     mosaic_format: str = ".json.gz"  # format will be ignored for dynamodb backend
 
+    permissions_boundary_name: Optional[str]
+
     class Config:
         """model config"""
 
