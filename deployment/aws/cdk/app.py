@@ -48,9 +48,7 @@ class titilerLambdaStack(core.Stack):
 
         if settings.permissions_boundary_name is not None:
             boundary = iam.ManagedPolicy.from_managed_policy_name(
-                self,
-                'Boundary',
-                settings.permissions_boundary_name
+                self, "Boundary", settings.permissions_boundary_name
             )
             iam.PermissionsBoundary.of(self).apply(boundary)
 
@@ -65,7 +63,8 @@ class titilerLambdaStack(core.Stack):
                 path=os.path.abspath(code_dir),
                 bundling=core.BundlingOptions(
                     image=core.BundlingDockerImage.from_asset(
-                        os.path.abspath(code_dir), file="lambda/Dockerfile",
+                        os.path.abspath(code_dir),
+                        file="lambda/Dockerfile",
                     ),
                     command=["bash", "-c", "cp -R /var/task/. /asset-output/."],
                 ),
