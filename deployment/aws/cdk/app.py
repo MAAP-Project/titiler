@@ -63,8 +63,7 @@ class titilerLambdaStack(core.Stack):
                 path=os.path.abspath(code_dir),
                 bundling=core.BundlingOptions(
                     image=core.BundlingDockerImage.from_asset(
-                        os.path.abspath(code_dir),
-                        file="lambda/Dockerfile",
+                        os.path.abspath(code_dir), file="lambda/Dockerfile",
                     ),
                     command=["bash", "-c", "cp -R /var/task/. /asset-output/."],
                 ),
