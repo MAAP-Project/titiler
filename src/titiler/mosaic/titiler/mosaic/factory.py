@@ -682,63 +682,63 @@ class MosaicTilerFactory(BaseTilerFactory):
 
             return mk_mosaic_entity(mosaic_id, self_uri)
 
-        @self.router.put(
-            "/mosaics/{mosaic_id}",
-            status_code=HTTP_204_NO_CONTENT,
-            responses={
-                HTTP_204_NO_CONTENT: {"description": "Updated a mosaic"},
-                HTTP_404_NOT_FOUND: {"description": "Mosaic with ID not found"},
-                HTTP_500_INTERNAL_SERVER_ERROR: {
-                    "description": "Mosaic could not be updated"
-                },
-            },
-        )
-        async def put_mosaic(
-            mosaic_id: str,
-            request: Request,
-            content_type: Optional[str] = Header(None),
-        ) -> None:
-            """Update an existing MosaicJSON"""
+        # @self.router.put(
+        #     "/mosaics/{mosaic_id}",
+        #     status_code=HTTP_204_NO_CONTENT,
+        #     responses={
+        #         HTTP_204_NO_CONTENT: {"description": "Updated a mosaic"},
+        #         HTTP_404_NOT_FOUND: {"description": "Mosaic with ID not found"},
+        #         HTTP_500_INTERNAL_SERVER_ERROR: {
+        #             "description": "Mosaic could not be updated"
+        #         },
+        #     },
+        # )
+        # async def put_mosaic(
+        #     mosaic_id: str,
+        #     request: Request,
+        #     content_type: Optional[str] = Header(None),
+        # ) -> None:
+        #     """Update an existing MosaicJSON"""
 
-            if not await retrieve(mosaic_id):
-                raise HTTPException(
-                    HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
-                )
+        #     if not await retrieve(mosaic_id):
+        #         raise HTTPException(
+        #             HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
+        #         )
 
-            try:
-                mosaicjson = await populate_mosaicjson(request, content_type)
-                await store(mosaic_id, mosaicjson, overwrite=True)
-            except StoreException:
-                raise HTTPException(
-                    HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
-                )
-            except Exception:
-                raise HTTPException(
-                    HTTP_500_INTERNAL_SERVER_ERROR, "Error: could not update mosaic."
-                )
-
-            return
+        #     try:
+        #         mosaicjson = await populate_mosaicjson(request, content_type)
+        #         await store(mosaic_id, mosaicjson, overwrite=True)
+        #     except StoreException:
+        #         raise HTTPException(
+        #             HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
+        #         )
+        #     except Exception:
+        #         raise HTTPException(
+        #             HTTP_500_INTERNAL_SERVER_ERROR, "Error: could not update mosaic."
+        #         )
+        # 
+        #     return
 
         # note: cogeo-mosaic doesn't clear the cache on write/delete, so these will stay until the TTL expires
         # https://github.com/developmentseed/cogeo-mosaic/issues/176
-        @self.router.delete(
-            "/mosaics/{mosaic_id}", status_code=HTTP_204_NO_CONTENT,
-        )
-        async def delete_mosaic(mosaic_id: str) -> None:
-            """Delete an existing MosaicJSON"""
+        # @self.router.delete(
+        #     "/mosaics/{mosaic_id}", status_code=HTTP_204_NO_CONTENT,
+        # )
+        # async def delete_mosaic(mosaic_id: str) -> None:
+        #     """Delete an existing MosaicJSON"""
 
-            if not await retrieve(mosaic_id):
-                raise HTTPException(
-                    HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
-                )
+        #     if not await retrieve(mosaic_id):
+        #         raise HTTPException(
+        #             HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
+        #         )
 
-            try:
-                await delete(mosaic_id)
-            except UnsupportedOperationException:
-                raise HTTPException(
-                    HTTP_405_METHOD_NOT_ALLOWED,
-                    "Error: mosaic with given ID cannot be deleted because the datastore does not support it.",
-                )
+        #     try:
+        #         await delete(mosaic_id)
+        #     except UnsupportedOperationException:
+        #         raise HTTPException(
+        #             HTTP_405_METHOD_NOT_ALLOWED,
+        #             "Error: mosaic with given ID cannot be deleted because the datastore does not support it.",
+        #         )
 
         # derived from cogeo-xyz
         @self.router.get(
