@@ -24,4 +24,4 @@ cd deployment/aws
 cp ".env.${DEPLOY_ENV}" .env
 
 # add `-- -vvv` at the end of this command to debug
-npm run cdk deploy "${DEPLOY_ENV}-dynamic-tiler-lambda" -- -vvv
+npm run cdk deploy "${DEPLOY_ENV}-titiler-lambda" -- -vvv
