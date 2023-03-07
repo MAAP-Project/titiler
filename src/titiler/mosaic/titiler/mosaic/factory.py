@@ -1110,7 +1110,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                         f"too many results: {matched} Items matched, but only a maximum of {MAX_ITEMS} are allowed."
                     )
 
-                return search_result.items_as_collection().to_dict()["features"]
+                return list(search_result.items_as_dicts())
             except TooManyResultsException as e:
                 raise e
             except Exception as e:

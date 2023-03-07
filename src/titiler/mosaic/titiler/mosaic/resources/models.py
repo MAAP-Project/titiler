@@ -1,11 +1,10 @@
 """Titiler.mosaic Models."""
 
 import re
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from pydantic import BaseModel, validator
-from stac_pydantic.api import Search
-
+from stac_pydantic.api.search import ExtendedSearch
 
 def to_camel(snake_str: str) -> str:
     """
@@ -39,7 +38,7 @@ rfc3339_regex_str = (
 rfc3339_regex = re.compile(rfc3339_regex_str)
 
 
-class StacApiQueryRequestBody(Search):
+class StacApiQueryRequestBody(ExtendedSearch):
     """Common request params for MosaicJSON CRUD operations"""
 
     stac_api_root: str
@@ -49,8 +48,6 @@ class StacApiQueryRequestBody(Search):
     attribution: Optional[str] = None
     version: Optional[str] = None
 
-    # override default Search field for collections, which is List[str]
-    collections: Optional[List[str]] = None
     # overriding limit so we can tell if it's defined or not
     limit: Optional[int]
 
