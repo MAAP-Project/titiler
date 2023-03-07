@@ -51,6 +51,8 @@ class StacApiQueryRequestBody(ExtendedSearch):
     # overriding limit so we can tell if it's defined or not
     limit: Optional[int]
 
+    max_items: Optional[int]
+
     @validator("datetime")
     def validate_datetime(cls, v):
         """
