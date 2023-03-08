@@ -4,12 +4,11 @@ WORKDIR /tmp
 
 COPY titiler.*.tar.gz /tmp/
 
-# rasterio 1.2.0 wheels are built using GDAL 3.2 and PROJ 7 which we found having a
-# performance downgrade: https://github.com/developmentseed/titiler/discussions/216
 RUN pip install \
         # mangum > 0.11.x removes the "log_level" parameter from the Mangum constructor
         mangum==0.11.0 \
-        # pre-existing -- surely there's a good reason to pin rasterio
+        # rasterio 1.2.0 wheels are built using GDAL 3.2 and PROJ 7 which we found having a
+        # performance downgrade: https://github.com/developmentseed/titiler/discussions/216
         rasterio==1.1.8 \
         # pin markupsafe so jinja will have access to soft_unicode
         # https://github.com/aws/aws-sam-cli/issues/3661#issuecomment-1044340547
