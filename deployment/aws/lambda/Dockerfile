@@ -5,11 +5,11 @@ WORKDIR /tmp
 COPY titiler.*.tar.gz /tmp/
 
 RUN pip install \
-        # mangum > 0.11.x removes the "log_level" parameter from the Mangum constructor
-        mangum==0.11.0 \
-        # rasterio 1.2.0 wheels are built using GDAL 3.2 and PROJ 7 which we found having a
-        # performance downgrade: https://github.com/developmentseed/titiler/discussions/216
-        rasterio==1.1.8 \
+        mangum==0.17.0 \
+        rasterio==1.3.6 \
+        morecantile==3.2.5 \
+        rio-tiler==4.1.9 \
+        cogeo-mosaic==3.0.2 \
         # pin markupsafe so jinja will have access to soft_unicode
         # https://github.com/aws/aws-sam-cli/issues/3661#issuecomment-1044340547
         markupsafe==2.0.1 \

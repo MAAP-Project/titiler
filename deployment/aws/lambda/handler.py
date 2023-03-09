@@ -9,4 +9,5 @@ from titiler.application.main import app
 logging.getLogger("mangum.lifespan").setLevel(logging.ERROR)
 logging.getLogger("mangum.http").setLevel(logging.ERROR)
 
-handler = Mangum(app, lifespan="auto", log_level="error")
+# mangum > 0.11.x removes the "log_level" parameter from the Mangum constructor
+handler = Mangum(app, lifespan="auto")

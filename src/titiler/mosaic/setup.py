@@ -7,7 +7,7 @@ with open("README.md") as f:
 
 inst_reqs = [
     "titiler.core",
-    "cogeo-mosaic>=3.0,<3.1",
+    "cogeo-mosaic",
     "mercantile",
     "pystac-client~=0.6.0",
     "stac-pydantic~=2.0.3",
