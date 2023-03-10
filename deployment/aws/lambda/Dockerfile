@@ -15,7 +15,7 @@ RUN pip install \
         rasterio==1.3.6 \
         morecantile==3.2.5 \
         rio-tiler==4.1.9 \
-        cogeo-mosaic==3.0.2 \
+        cogeo-mosaic==5.1.1 \
         # pin markupsafe so jinja will have access to soft_unicode
         # https://github.com/aws/aws-sam-cli/issues/3661#issuecomment-1044340547
         markupsafe==2.0.1 \
