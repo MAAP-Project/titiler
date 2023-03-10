@@ -37,6 +37,25 @@ rfc3339_regex_str = (
 )
 rfc3339_regex = re.compile(rfc3339_regex_str)
 
+from enum import auto
+from stac_pydantic.utils import AutoValueEnum
+
+# copied from stac_pydantic, because the neq, lte, and gte were wrong (ne, le, and ge)
+class Operator(str, AutoValueEnum):
+    """
+    https://github.com/radiantearth/stac-api-spec/tree/master/extensions/query#query-api-extension
+    """
+
+    eq = auto()
+    neq = auto()
+    lt = auto()
+    lte = auto()
+    gt = auto()
+    gte = auto()
+    startsWith = auto()
+    endsWith = auto()
+    contains = auto()
+
 
 class StacApiQueryRequestBody(ExtendedSearch):
     """Common request params for MosaicJSON CRUD operations"""
@@ -52,6 +71,9 @@ class StacApiQueryRequestBody(ExtendedSearch):
     limit: Optional[int]
 
     max_items: Optional[int]
+
+    # overriding query to use our Operator class rather than the broken stac_pydantic one
+    query: Optional[Dict[str, Dict[Operator, Any]]]
 
     @validator("datetime")
     def validate_datetime(cls, v):
