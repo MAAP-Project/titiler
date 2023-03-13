@@ -23,5 +23,4 @@ done
 cd deployment/aws
 cp ".env.${DEPLOY_ENV}" .env
 
-# add `-- -vvv` at the end of this command to debug
-npm run cdk deploy "${DEPLOY_ENV}-dynamic-tiler-lambda" --require-approval never -- -vvv
+npm run cdk deploy "${DEPLOY_ENV}-titiler-mosaic-lambda" --require-approval never -- -vvv
