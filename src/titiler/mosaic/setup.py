@@ -7,10 +7,10 @@ with open("README.md") as f:
 
 inst_reqs = [
     "titiler.core",
-    "cogeo-mosaic>=3.0,<3.1",
+    "cogeo-mosaic",
     "mercantile",
-    "pystac-client~=0.1.1",
-    "stac_pydantic",  # inherit version from pystac-client
+    "pystac-client~=0.6.0",
+    "stac-pydantic~=2.0.3",
     "morecantile>=2.1.4",  # 2.1.4 adds tilesetmatrix values, that tests depend on.also a transitive dep of cogeo-mosaic
 ]
 extra_reqs = {

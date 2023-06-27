@@ -81,7 +81,8 @@ class titilerLambdaStack(core.Stack):
         api = apigw.HttpApi(
             self,
             f"{id}-endpoint",
-            default_integration=apigw_integrations.LambdaProxyIntegration(
+            default_integration=apigw_integrations.HttpLambdaIntegration(
+                f"{id}-hli",
                 handler=lambda_function
             ),
         )

@@ -1088,29 +1088,27 @@ class MosaicTilerFactory(BaseTilerFactory):
             except Exception as e:
                 raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR, f"Error: {e}")
 
-        MAX_ITEMS = 100
+        MAX_ITEMS = 1000
 
         def execute_stac_search(mosaic_request: StacApiQueryRequestBody) -> List[dict]:
             try:
                 search_result = Client.open(mosaic_request.stac_api_root).search(
-                    # **mosaic_request.dict(), ?? this feel a little unsafe
                     ids=mosaic_request.ids,
                     collections=mosaic_request.collections,
                     datetime=mosaic_request.datetime,
                     bbox=mosaic_request.bbox,
                     intersects=mosaic_request.intersects,
                     query=mosaic_request.query,
-                    max_items=MAX_ITEMS,
+                    max_items=mosaic_request.max_items if mosaic_request.max_items and mosaic_request.max_items < MAX_ITEMS else MAX_ITEMS,
                     limit=mosaic_request.limit if mosaic_request.limit else 100,
-                    # setting limit >500 causes an error https://github.com/stac-utils/pystac-client/issues/56
                 )
-                matched = search_result.matched()
-                if matched > MAX_ITEMS:
-                    raise TooManyResultsException(
-                        f"too many results: {matched} Items matched, but only a maximum of {MAX_ITEMS} are allowed."
-                    )
+                # matched = search_result.matched()
+                # if matched > MAX_ITEMS:
+                #     raise TooManyResultsException(
+                #         f"too many results: {matched} Items matched, but only a maximum of {MAX_ITEMS} are allowed."
+                #     )
 
-                return search_result.items_as_collection().to_dict()["features"]
+                return list(search_result.items_as_dicts())
             except TooManyResultsException as e:
                 raise e
             except Exception as e:

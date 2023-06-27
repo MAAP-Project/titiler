@@ -7,7 +7,10 @@ from typing import Dict, Optional
 import morecantile
 from morecantile import tms
 from morecantile.models import TileMatrixSet
-from rasterio.crs import CRS
+
+# rasterio switched to using pyproj 1.3
+from pyproj import CRS
+
 from rio_tiler.colormap import cmap, parse_color
 
 from fastapi import HTTPException, Query

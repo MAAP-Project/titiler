@@ -9,7 +9,10 @@ import rasterio
 from geojson_pydantic.features import Feature, FeatureCollection
 from morecantile import TileMatrixSet
 from rio_tiler.io import BaseReader, COGReader, MultiBandReader, MultiBaseReader
-from rio_tiler.models import Bounds, Info, Metadata
+
+# rio_tiler broke up the Metadata class into multiple, more specific classes
+# between 2.1.x and 4.x
+from rio_tiler.models import Bounds, Info #, Metadata
 
 from titiler.core.dependencies import (
     AssetsBidxExprParams,
@@ -161,7 +164,7 @@ class TilerFactory(BaseTilerFactory):
         # (/bounds, /info, /metadata, /tile, /tilejson.json, /WMTSCapabilities.xml and /point)
         self.bounds()
         self.info()
-        self.metadata()
+        # self.metadata()
         self.tile()
         self.tilejson()
         self.wmts()
@@ -247,34 +250,34 @@ class TilerFactory(BaseTilerFactory):
     ############################################################################
     # /metadata
     ############################################################################
-    def metadata(self):
-        """Register /metadata endpoint"""
+    # def metadata(self):
+    #     """Register /metadata endpoint"""
 
-        @self.router.get(
-            "/metadata",
-            response_model=Metadata,
-            response_model_exclude={"minzoom", "maxzoom", "center"},
-            response_model_exclude_none=True,
-            responses={200: {"description": "Return dataset's metadata."}},
-        )
-        def metadata(
-            src_path=Depends(self.path_dependency),
-            metadata_params=Depends(self.metadata_dependency),
-            layer_params=Depends(BidxParams),
-            dataset_params=Depends(self.dataset_dependency),
-            kwargs: Dict = Depends(self.additional_dependency),
-        ):
-            """Return metadata."""
-            with rasterio.Env(**self.gdal_config):
-                with self.reader(src_path, **self.reader_options) as src_dst:
-                    return src_dst.metadata(
-                        metadata_params.pmin,
-                        metadata_params.pmax,
-                        **layer_params.kwargs,
-                        **metadata_params.kwargs,
-                        **dataset_params.kwargs,
-                        **kwargs,
-                    )
+    #     @self.router.get(
+    #         "/metadata",
+    #         response_model=Metadata,
+    #         response_model_exclude={"minzoom", "maxzoom", "center"},
+    #         response_model_exclude_none=True,
+    #         responses={200: {"description": "Return dataset's metadata."}},
+    #     )
+    #     def metadata(
+    #         src_path=Depends(self.path_dependency),
+    #         metadata_params=Depends(self.metadata_dependency),
+    #         layer_params=Depends(BidxParams),
+    #         dataset_params=Depends(self.dataset_dependency),
+    #         kwargs: Dict = Depends(self.additional_dependency),
+    #     ):
+    #         """Return metadata."""
+    #         with rasterio.Env(**self.gdal_config):
+    #             with self.reader(src_path, **self.reader_options) as src_dst:
+    #                 return src_dst.metadata(
+    #                     metadata_params.pmin,
+    #                     metadata_params.pmax,
+    #                     **layer_params.kwargs,
+    #                     **metadata_params.kwargs,
+    #                     **dataset_params.kwargs,
+    #                     **kwargs,
+    #                 )
 
     ############################################################################
     # /tiles
@@ -987,32 +990,32 @@ class MultiBaseTilerFactory(TilerFactory):
 
     # Overwrite the `/metadata` endpoint because the MultiBaseReader output model is different (Dict[str, cogMetadata])
     # and MultiBaseReader.metadata() method also has `assets` as a requirement arguments.
-    def metadata(self):
-        """Register /metadata endpoint."""
+    # def metadata(self):
+    #     """Register /metadata endpoint."""
 
-        @self.router.get(
-            "/metadata",
-            response_model=Dict[str, Metadata],
-            response_model_exclude={"minzoom", "maxzoom", "center"},
-            response_model_exclude_none=True,
-            responses={200: {"description": "Return dataset's metadata."}},
-        )
-        def metadata(
-            src_path=Depends(self.path_dependency),
-            asset_params=Depends(AssetsBidxParams),
-            metadata_params=Depends(self.metadata_dependency),
-            kwargs: Dict = Depends(self.additional_dependency),
-        ):
-            """Return metadata."""
-            with rasterio.Env(**self.gdal_config):
-                with self.reader(src_path, **self.reader_options) as src_dst:
-                    return src_dst.metadata(
-                        metadata_params.pmin,
-                        metadata_params.pmax,
-                        **asset_params.kwargs,
-                        **metadata_params.kwargs,
-                        **kwargs,
-                    )
+    #     @self.router.get(
+    #         "/metadata",
+    #         response_model=Dict[str, Metadata],
+    #         response_model_exclude={"minzoom", "maxzoom", "center"},
+    #         response_model_exclude_none=True,
+    #         responses={200: {"description": "Return dataset's metadata."}},
+    #     )
+    #     def metadata(
+    #         src_path=Depends(self.path_dependency),
+    #         asset_params=Depends(AssetsBidxParams),
+    #         metadata_params=Depends(self.metadata_dependency),
+    #         kwargs: Dict = Depends(self.additional_dependency),
+    #     ):
+    #         """Return metadata."""
+    #         with rasterio.Env(**self.gdal_config):
+    #             with self.reader(src_path, **self.reader_options) as src_dst:
+    #                 return src_dst.metadata(
+    #                     metadata_params.pmin,
+    #                     metadata_params.pmax,
+    #                     **asset_params.kwargs,
+    #                     **metadata_params.kwargs,
+    #                     **kwargs,
+    #                 )
 
 
 @dataclass
