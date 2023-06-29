@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/10407788/84913491-99c3ac80-b088-11ea-846d-75db9e3ab31c.jpg"/>
+  <img width="500" src="https://user-images.githubusercontent.com/10407788/172718020-c2378b7e-a0d4-406e-924c-8ffe54e61596.png"/>
   <p align="center">A modern dynamic tile server built on top of FastAPI and Rasterio/GDAL.</p>
 </p>
 
@@ -8,15 +8,15 @@
       <img src="https://github.com/developmentseed/titiler/workflows/CI/badge.svg" alt="Test">
   </a>
   <a href="https://codecov.io/gh/developmentseed/titiler" target="_blank">
-      <img src="https://codecov.io/gh/developmentseed/titiler/branch/master/graph/badge.svg" alt="Coverage">
+      <img src="https://codecov.io/gh/developmentseed/titiler/branch/main/graph/badge.svg" alt="Coverage">
   </a>
   <a href="https://pypi.org/project/titiler" target="_blank">
       <img src="https://img.shields.io/pypi/v/titiler?color=%2334D058&label=pypi%20package" alt="Package version">
   </a>
-  <a href="https://github.com/developmentseed/titiler/blob/master/LICENSE" target="_blank">
+  <a href="https://github.com/developmentseed/titiler/blob/main/LICENSE" target="_blank">
       <img src="https://img.shields.io/github/license/developmentseed/titiler.svg" alt="Downloads">
   </a>
-  <a href="https://mybinder.org/v2/gh/developmentseed/titiler/master" target="_blank">
+  <a href="https://mybinder.org/v2/gh/developmentseed/titiler/main" target="_blank">
       <img src="https://mybinder.org/badge_logo.svg" alt="Downloads">
   </a>
   <a href="https://hub.docker.com/r/developmentseed/titiler" target="_blank">
@@ -54,9 +54,10 @@ Starting with version `0.3.0`, the `TiTiler` python module has been split into a
 
 | Package | Version |  Description
 | ------- | ------- |-------------
-[**titiler.core**](https://github.com/developmentseed/titiler/tree/master/titiler/core) | [![titiler.core](https://img.shields.io/pypi/v/titiler.core?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.core) | The `Core` package contains libraries to help create a  dynamic tiler for COG and STAC
-[**titiler.mosaic**](https://github.com/developmentseed/titiler/tree/master/titiler/mosaic) | [![titiler.mosaic](https://img.shields.io/pypi/v/titiler.mosaic?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.mosaic) | The `mosaic` package contains libraries to help create a dynamic tiler for MosaicJSON (adds `cogeo-mosaic` requirement)
-[**titiler.application**](https://github.com/developmentseed/titiler/tree/master/titiler/application) | [![titiler.application](https://img.shields.io/pypi/v/titiler.application?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.application) | TiTiler's `demo` package. Contains a FastAPI application with full support of COG, STAC and MosaicJSON
+[**titiler.core**](https://github.com/developmentseed/titiler/tree/main/src/titiler/core) | [![titiler.core](https://img.shields.io/pypi/v/titiler.core?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.core) | The `Core` package contains libraries to help create a  dynamic tiler for COG and STAC
+[**titiler.extensions**](https://github.com/developmentseed/titiler/tree/main/src/titiler/extensions) | [![titiler.extensions](https://img.shields.io/pypi/v/titiler.extensions?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.extensions) | TiTiler's extensions package. Contains extensions for Tiler Factories.
+[**titiler.mosaic**](https://github.com/developmentseed/titiler/tree/main/src/titiler/mosaic) | [![titiler.mosaic](https://img.shields.io/pypi/v/titiler.mosaic?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.mosaic) | The `mosaic` package contains libraries to help create a dynamic tiler for MosaicJSON (adds `cogeo-mosaic` requirement)
+[**titiler.application**](https://github.com/developmentseed/titiler/tree/main/src/titiler/application) | [![titiler.application](https://img.shields.io/pypi/v/titiler.application?color=%2334D058&label=pypi)](https://pypi.org/project/titiler.application) | TiTiler's `demo` package. Contains a FastAPI application with full support of COG, STAC and MosaicJSON
 
 
 ## Installation
@@ -64,59 +65,56 @@ Starting with version `0.3.0`, the `TiTiler` python module has been split into a
 To install from PyPI and run:
 
 ```bash
-$ pip install -U pip
-$ pip install uvicorn
-$ pip install titiler.{package}
+# Make sure you have pip up to date
+python -m pip install -U pip
+
+python -m pip  install titiler.{package}
 # e.g.,
-# pip install titiler.core
-# pip install titiler.mosaic
-# pip install titiler.application (also installs core and mosaic)
-$ uvicorn titiler.application.main:app
+# python -m pip  install titiler.core
+# python -m pip  install titiler.extensions
+# python -m pip  install titiler.mosaic
+# python -m pip  install titiler.application (also installs core, extensions and mosaic)
+
+# Install uvicorn to run the FastAPI application locally
+python -m pip install uvicorn
+
+# Launch application locally
+uvicorn titiler.application.main:app
 ```
 
 To install from sources and run for development:
 
 ```
-$ git clone https://github.com/developmentseed/titiler.git
-$ cd titiler
-$ pip install -e src/titiler/core -e src/titiler/mosaic -e src/titiler/application
-$ pip install uvicorn
-$ uvicorn titiler.application.main:app --reload
+git clone https://github.com/developmentseed/titiler.git
+cd titiler
+
+python -m pip install -U pip
+python -m pip install -e src/titiler/core -e src/titiler/extensions -e src/titiler/mosaic -e src/titiler/application
+python -m pip install uvicorn
+
+uvicorn titiler.application.main:app --reload
 ```
 
 ## Docker
 
-Ready to use/deploy images can be found on Docker Hub and AWS public ECR registery.
+Ready to use/deploy images can be found on Github registry.
 
-- Docker Hub: https://hub.docker.com/repository/docker/developmentseed/titiler
-
-```bash
-docker run --name titiler \
-    -p 8000:8000 \
-    --env PORT=8000 \
-    --env WORKERS_PER_CORE=1 \
-    --rm -it developmentseed/titiler
-```
-
-- AWS ECR: https://gallery.ecr.aws/developmentseed/titiler
+- https://github.com/developmentseed/titiler/pkgs/container/titiler
 
 ```bash
 docker run --name titiler \
     -p 8000:8000 \
     --env PORT=8000 \
     --env WORKERS_PER_CORE=1 \
-    --rm -it public.ecr.aws/developmentseed/titiler
+    --rm -it ghcr.io/developmentseed/titiler:latest
 ```
 
 - Built the docker locally
 ```
-$ git clone https://github.com/developmentseed/titiler.git
-$ cd titiler
+git clone https://github.com/developmentseed/titiler.git
+cd titiler
 
-$ export AWS_ACCESS_KEY_ID=...
-$ export AWS_SECRET_ACCESS_KEY=...
-$ docker-compose build
-$ docker-compose up
+docker-compose up --build titiler  # or titiler-uvicorn
 ```
 
 Some options can be set via environment variables, see: https://github.com/tiangolo/uvicorn-gunicorn-docker#advanced-usage
@@ -126,17 +124,18 @@ Some options can be set via environment variables, see: https://github.com/tiang
 ```
 src/titiler/                     - titiler modules.
  ├── application/                - Titiler's `Application` package
+ ├── extensions/                 - Titiler's `Extensions` package
  ├── core/                       - Titiler's `Core` package
  └── mosaic/                     - Titiler's `Mosaic` package
 ```
 
 ## Contribution & Development
 
-See [CONTRIBUTING.md](https://github.com/developmentseed/titiler/blob/master/CONTRIBUTING.md)
+See [CONTRIBUTING.md](https://github.com/developmentseed/titiler/blob/main/CONTRIBUTING.md)
 
 ## License
 
-See [LICENSE](https://github.com/developmentseed/titiler/blob/master/LICENSE)
+See [LICENSE](https://github.com/developmentseed/titiler/blob/main/LICENSE)
 
 ## Authors
 
@@ -146,4 +145,4 @@ See [contributors](https://github.com/developmentseed/titiler/graphs/contributor
 
 ## Changes
 
-See [CHANGES.md](https://github.com/developmentseed/titiler/blob/master/CHANGES.md).
+See [CHANGES.md](https://github.com/developmentseed/titiler/blob/main/CHANGES.md).

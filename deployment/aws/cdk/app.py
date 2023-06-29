@@ -3,14 +3,17 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from aws_cdk import aws_apigatewayv2 as apigw
-from aws_cdk import aws_apigatewayv2_integrations as apigw_integrations
+from aws_cdk import App, CfnOutput, Duration, Stack, Tags
+from aws_cdk import aws_apigatewayv2_alpha as apigw
 from aws_cdk import aws_ec2 as ec2
 from aws_cdk import aws_ecs as ecs
 from aws_cdk import aws_ecs_patterns as ecs_patterns
 from aws_cdk import aws_iam as iam
-from aws_cdk import aws_lambda, core
+from aws_cdk import aws_lambda
+from aws_cdk import aws_logs as logs
+from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpLambdaIntegration
 from config import StackSettings
+from constructs import Construct
 
 settings = StackSettings()
 
@@ -20,7 +23,7 @@ if settings.mosaic_backend and settings.mosaic_host:
     )
 
 
-class titilerLambdaStack(core.Stack):
+class titilerLambdaStack(Stack):
     """
     Titiler Lambda Stack
 
@@ -32,11 +35,11 @@ class titilerLambdaStack(core.Stack):
 
     def __init__(
         self,
-        scope: core.Construct,
+        scope: Construct,
         id: str,
         memory: int = 1024,
-        timeout: int = 60,
-        runtime: aws_lambda.Runtime = aws_lambda.Runtime.PYTHON_3_8,
+        timeout: int = 30,
+        runtime: aws_lambda.Runtime = aws_lambda.Runtime.PYTHON_3_10,
         concurrent: Optional[int] = None,
         permissions: Optional[List[iam.PolicyStatement]] = None,
         environment: Optional[Dict] = None,
@@ -44,7 +47,7 @@ class titilerLambdaStack(core.Stack):
         **kwargs: Any,
     ) -> None:
         """Define stack."""
-        super().__init__(scope, id, *kwargs)
+        super().__init__(scope, id, **kwargs)
 
         if settings.permissions_boundary_name is not None:
             boundary = iam.ManagedPolicy.from_managed_policy_name(
@@ -59,20 +62,16 @@ class titilerLambdaStack(core.Stack):
             self,
             f"{id}-lambda",
             runtime=runtime,
-            code=aws_lambda.Code.from_asset(
+            code=aws_lambda.Code.from_docker_build(
                 path=os.path.abspath(code_dir),
-                bundling=core.BundlingOptions(
-                    image=core.BundlingDockerImage.from_asset(
-                        os.path.abspath(code_dir), file="lambda/Dockerfile",
-                    ),
-                    command=["bash", "-c", "cp -R /var/task/. /asset-output/."],
-                ),
+                file="lambda/Dockerfile",
             ),
             handler="handler.handler",
             memory_size=memory,
             reserved_concurrent_executions=concurrent,
-            timeout=core.Duration.seconds(timeout),
+            timeout=Duration.seconds(timeout),
             environment=environment,
+            log_retention=logs.RetentionDays.ONE_WEEK,
         )
 
         for perm in permissions:
@@ -81,20 +80,19 @@ class titilerLambdaStack(core.Stack):
         api = apigw.HttpApi(
             self,
             f"{id}-endpoint",
-            default_integration=apigw_integrations.HttpLambdaIntegration(
-                f"{id}-hli",
-                handler=lambda_function
+            default_integration=HttpLambdaIntegration(
+                f"{id}-hli", handler=lambda_function
             ),
         )
-        core.CfnOutput(self, "Endpoint", value=api.url)
+        CfnOutput(self, "Endpoint", value=api.url)
 
 
-class titilerECSStack(core.Stack):
+class titilerECSStack(Stack):
     """Titiler ECS Fargate Stack."""
 
     def __init__(
         self,
-        scope: core.Construct,
+        scope: Construct,
         id: str,
         cpu: Union[int, float] = 256,
         memory: Union[int, float] = 512,
@@ -116,7 +114,7 @@ class titilerECSStack(core.Stack):
         cluster = ecs.Cluster(self, f"{id}-cluster", vpc=vpc)
 
         task_env = environment.copy()
-        task_env.update(dict(LOG_LEVEL="error"))
+        task_env.update({"LOG_LEVEL": "error"})
 
         # GUNICORN configuration
         if settings.workers_per_core:
@@ -137,7 +135,7 @@ class titilerECSStack(core.Stack):
             listener_port=80,
             task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
                 image=ecs.ContainerImage.from_registry(
-                    f"public.ecr.aws/developmentseed/titiler:{settings.image_version}",
+                    f"ghcr.io/developmentseed/titiler:{settings.image_version}",
                 ),
                 container_port=80,
                 environment=task_env,
@@ -156,8 +154,8 @@ class titilerECSStack(core.Stack):
         scalable_target.scale_on_request_count(
             "RequestScaling",
             requests_per_target=50,
-            scale_in_cooldown=core.Duration.seconds(240),
-            scale_out_cooldown=core.Duration.seconds(30),
+            scale_in_cooldown=Duration.seconds(240),
+            scale_out_cooldown=Duration.seconds(30),
             target_group=fargate_service.target_group,
         )
 
@@ -175,7 +173,7 @@ class titilerECSStack(core.Stack):
         )
 
 
-app = core.App()
+app = App()
 
 perms = []
 if settings.buckets:
@@ -220,20 +218,9 @@ elif settings.mosaic_backend == "dynamodb://":
         )
     )
 
-# Tag infrastructure
-for key, value in {
-    "Project": settings.name,
-    "Stack": settings.stage,
-    "Owner": settings.owner,
-    "Client": settings.client,
-}.items():
-    if value:
-        core.Tag.add(app, key, value)
-
-ecs_stackname = f"{settings.name}-ecs-{settings.stage}"
-titilerECSStack(
+ecs_stack = titilerECSStack(
     app,
-    ecs_stackname,
+    f"{settings.name}-ecs-{settings.stage}",
     cpu=settings.task_cpu,
     memory=settings.task_memory,
     mincount=settings.min_ecs_instances,
@@ -242,15 +229,26 @@ titilerECSStack(
     environment=settings.env,
 )
 
-lambda_stackname = f"{settings.stage}-{settings.name}-lambda"
-titilerLambdaStack(
+lambda_stack = titilerLambdaStack(
     app,
-    lambda_stackname,
+    f"{settings.name}-lambda-{settings.stage}",
     memory=settings.memory,
     timeout=settings.timeout,
     concurrent=settings.max_concurrent,
     permissions=perms,
     environment=settings.env,
 )
+
+# Tag infrastructure
+for key, value in {
+    "Project": settings.name,
+    "Stack": settings.stage,
+    "Owner": settings.owner,
+    "Client": settings.client,
+}.items():
+    if value:
+        Tags.of(ecs_stack).add(key, value)
+        Tags.of(lambda_stack).add(key, value)
+
 
 app.synth()
