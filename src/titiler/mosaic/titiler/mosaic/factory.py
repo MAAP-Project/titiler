@@ -790,7 +790,6 @@ class MosaicTilerFactory(BaseTilerFactory):
             dataset_params=Depends(self.dataset_dependency),  # noqa
             render_params=Depends(self.render_dependency),  # noqa
             colormap=Depends(self.colormap_dependency),  # noqa
-            kwargs: Dict = Depends(self.additional_dependency),  # noqa
         ) -> TileJSON:
             """Return TileJSON document for a MosaicJSON."""
 
@@ -962,7 +961,6 @@ class MosaicTilerFactory(BaseTilerFactory):
             pixel_selection: PixelSelectionMethod = Query(
                 PixelSelectionMethod.first, description="Pixel selection method."
             ),
-            kwargs: Dict = Depends(self.additional_dependency),
         ):
             """Create map tile from a mosaic."""
 
