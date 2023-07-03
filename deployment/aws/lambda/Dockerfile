@@ -1,9 +1,12 @@
-FROM lambci/lambda:build-python3.8
+ARG PYTHON_VERSION=3.10
+
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:${PYTHON_VERSION}
 
 WORKDIR /tmp
 
 COPY titiler.*.tar.gz /tmp/
 
+RUN pip install pip -U
 RUN pip install \
         # mangum is required by our handler.py, and isn't a dependency of the
         # titiler packages
@@ -19,7 +22,9 @@ RUN pip install \
         # pin markupsafe so jinja will have access to soft_unicode
         # https://github.com/aws/aws-sam-cli/issues/3661#issuecomment-1044340547
         markupsafe==2.0.1 \
-        titiler.application-0.3.5.tar.gz titiler.mosaic-0.3.5.tar.gz titiler.core-0.3.5.tar.gz \
+        titiler.application==0.11.7 \
+        titiler.mosaic==0.11.7 \
+        titiler.core==0.11.7 \
         -t /var/task --no-binary pydantic
         # original code also had --no-binary numpy, which takes 20-30 minutes to build
 

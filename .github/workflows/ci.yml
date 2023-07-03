@@ -1,32 +1,30 @@
 name: CI
 
-# On every pull request, but only on push to master
+# On every pull request, but only on push to main
 on:
   push:
     branches:
-    - master
+    - main
     tags:
     - '*'
     paths:
-      # Only run test and docker publish if somde code have changed
+      # Only run test and docker publish if some code have changed
       - 'setup.py'
       - 'setup.cfg'
-      - 'titiler/**'
-      - 'tests/**'
-      - 'tests/**'
+      - 'src/titiler/**'
       - '.pre-commit-config.yaml'
-      - 'codecov.yml'
-      - 'Dockerfile'
-      - 'MANIFEST.in'
-      - 'tox.ini'
+      - '.github/codecov.yml'
+      - 'dockerfiles/**'
   pull_request:
+env:
+  LATEST_PY_VERSION: '3.10'
 
 jobs:
   tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
       - uses: actions/checkout@v2
@@ -38,24 +36,40 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install tox codecov pre-commit
 
-      # Run tox using the version of Python in `PATH`
-      - name: Run Tox
-        run: tox -e py
+      - name: Test titiler.core
+        run: |
+          python -m pip install -e src/titiler/core["test"]
+          python -m pytest src/titiler/core --cov=titiler.core --cov-report=xml --cov-append --cov-report=term-missing
 
-      # Run pre-commit (only for python-3.8)
+      - name: Test titiler.extensions
+        run: |
+          python -m pip install -e src/titiler/extensions["test,cogeo,stac"]
+          python -m pytest src/titiler/extensions --cov=titiler.extensions --cov-report=xml --cov-append --cov-report=term-missing
+
+      - name: Test titiler.mosaic
+        run: |
+          python -m pip install -e src/titiler/mosaic["test"]
+          python -m pytest src/titiler/mosaic --cov=titiler.mosaic --cov-report=xml --cov-append --cov-report=term-missing
+
+      - name: Test titiler.application
+        run: |
+          python -m pip install -e src/titiler/application["test"]
+          python -m pytest src/titiler/application --cov=titiler.application --cov-report=xml --cov-append --cov-report=term-missing
+
       - name: run pre-commit
-        if: matrix.python-version == 3.8
-        run: pre-commit run --all-files
+        if: ${{ matrix.python-version == env.LATEST_PY_VERSION }}
+        run: |
+          python -m pip install pre-commit
+          pre-commit run --all-files
 
       - name: Upload Results
-        if: success()
+        if: ${{ matrix.python-version == env.LATEST_PY_VERSION }}
         uses: codecov/codecov-action@v1
         with:
-          files: ./coverage.xml
+          file: ./coverage.xml
           flags: unittests
-          name: ${{ matrix.platform }}-${{ matrix.tox-env }}
+          name: ${{ matrix.python-version }}
           fail_ci_if_error: false
 
   publish:
@@ -67,12 +81,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: "3.x"
+          python-version: ${{ env.LATEST_PY_VERSION }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          pip install twine build hatch
 
       - name: Set tag version
         id: tag
@@ -82,12 +96,11 @@ jobs:
       - name: Set module version
         id: module
         # https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
-        run: echo ::set-output name=version::$(python setup.py --version)
+        run: echo ::set-output name=version::$(hatch --quiet version)
 
-      - name: Build and publish
+      - name: Build and publish titiler packages
         if: steps.tag.outputs.tag == steps.module.outputs.version
         env:
-          TOXENV: release
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
@@ -95,7 +108,7 @@ jobs:
 
   publish-docker:
     needs: [tests]
-    if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
+    if: github.ref == 'refs/heads/main' || startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -113,40 +126,125 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Public ECR
+      - name: Login to Github
         uses: docker/login-action@v1
         with:
-          registry: public.ecr.aws
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        env:
-          AWS_REGION: us-east-1
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set tag version
         id: tag
         # https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-
-      # Push `latest` when commiting to master
-      - name: Build and push
-        if: github.ref == 'refs/heads/master'
+      # Uvicorn
+      # Push `latest` when commiting to main
+      - name: Build and push uvicorn
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v2
         with:
+          # See https://github.com/developmentseed/titiler/discussions/387
+          platforms: linux/amd64
           context: .
-          file: Dockerfile
+          file: dockerfiles/Dockerfile.uvicorn
           push: true
           tags: |
-            developmentseed/titiler:latest
-            public.ecr.aws/${{ secrets.AWS_ECR_PUBLIC_REPO }}/titiler:latest
+            ghcr.io/${{ github.repository }}-uvicorn:latest
+
+      # Push `{VERSION}` when pushing a new tag
+      - name: Build and push uvicorn
+        if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
+        uses: docker/build-push-action@v2
+        with:
+          # See https://github.com/developmentseed/titiler/discussions/387
+          platforms: linux/amd64
+          context: .
+          file: dockerfiles/Dockerfile.uvicorn
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-uvicorn:${{ steps.tag.outputs.tag }}
+
+      # Gunicorn
+      # Push `latest` when commiting to main
+      - name: Build and push
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v2
+        with:
+          # See https://github.com/developmentseed/titiler/discussions/387
+          platforms: linux/amd64
+          context: .
+          file: dockerfiles/Dockerfile.gunicorn
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
 
       # Push `{VERSION}` when pushing a new tag
       - name: Build and push
         if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
         uses: docker/build-push-action@v2
         with:
+          # See https://github.com/developmentseed/titiler/discussions/387
+          platforms: linux/amd64
           context: .
-          file: Dockerfile
+          file: dockerfiles/Dockerfile.gunicorn
           push: true
           tags: |
-            developmentseed/titiler:${{ steps.tag.outputs.tag }}
-            public.ecr.aws/${{ secrets.AWS_ECR_PUBLIC_REPO }}/titiler:${{ steps.tag.outputs.tag }}
+            ghcr.io/${{ github.repository }}:${{ steps.tag.outputs.tag }}
+
+  deploy:
+    needs: [tests, publish]
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
+
+    defaults:
+      run:
+        working-directory: deployment/aws
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Let's wait a bit to make sure Pypi is up to date
+      - name: Sleep for 120 seconds
+        run: sleep 120s
+        shell: bash
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - name: Install cdk
+        run: npm install -g
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-cdk.txt
+
+      # Let's wait a bit to make sure package is available on pypi
+      - name: Sleep for 120 seconds
+        run: sleep 120s
+        shell: bash
+
+      # Build and Deploy CDK application
+      - name: Build & Deploy
+        run: npm run cdk -- deploy ${{ secrets.STACK_NAME }}-lambda-${{ secrets.STACK_STAGE }} --require-approval never
+        env:
+          TITILER_STACK_NAME: ${{ secrets.STACK_NAME }}
+          TITILER_STACK_STAGE: ${{ secrets.STACK_STAGE }}
+          TITILER_STACK_MEMORY: ${{ secrets.STACK_MEMORY }}
+          TITILER_STACK_OWNER: ${{ secrets.STACK_OWNER }}
+          TITILER_STACK_CLIENT: ${{ secrets.STACK_CLIENT }}
+          TITILER_STACK_BUCKETS: ${{ secrets.STACK_BUCKETS }}

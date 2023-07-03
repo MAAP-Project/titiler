@@ -1,6 +1,10 @@
-# Ignore cdk folder
-cdk.out
 .history
 .tox
 .git
+.github
 .vscode
+
+deployment/*
+docs/*
+
+deployment/aws/**
