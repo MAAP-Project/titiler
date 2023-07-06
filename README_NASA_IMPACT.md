@@ -1,6 +1,6 @@
 # Titiler NASA IMPACT fork Readme
 
-Clone the NASA-IMPACT fork of titiler and add a remote for the upstream "official" titiler repo.
+Clone the NASA-IMPACT fork of titiler and add a remote for the upstream "official" titiler repo. (Note: first check if upstream repo has migrated from 'master' to 'main')
 
 ```
 git clone git@github.com:NASA-IMPACT/titiler.git
@@ -29,5 +29,5 @@ Push the changes to the remote:
 git push merge-from-upstream-${TITILER_VERSION} -u origin/merge-from-upstream-${TITILER_VERSION}
 ```
 
-In GitHub, create a PR to merge the branch to master, get approvals, and merge with the "Merge commit" method (e.g., not squash).
+In GitHub, create a PR to merge the branch to main (previously master), get approvals, and merge with the "Merge commit" method (e.g., not squash).
 

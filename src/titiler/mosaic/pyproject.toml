@@ -31,6 +31,10 @@ dynamic = ["version"]
 dependencies = [
     "titiler.core==0.11.7",
     "cogeo-mosaic>=5.0,<5.2",
+    "mercantile",
+    "pystac-client~=0.6.0",
+    "stac-pydantic~=2.0.3",
+    "morecantile>=2.1.4",  # 2.1.4 adds tilesetmatrix values, that tests depend on.also a transitive dep of cogeo-mosaic
 ]
 
 [project.optional-dependencies]
@@ -39,6 +43,7 @@ test = [
     "pytest-cov",
     "pytest-asyncio",
     "httpx",
+    "requests",
 ]
 
 [project.urls]
