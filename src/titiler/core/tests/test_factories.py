@@ -1231,7 +1231,7 @@ def test_MultiBandTilerFactory():
 
     response = client.post(
         f"/statistics?directory={DATA_DIR}",
-    json=band_feature["features"][0],
+        json=band_feature["features"][0],
     )
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/geo+json"

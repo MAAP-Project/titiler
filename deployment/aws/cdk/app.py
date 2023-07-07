@@ -11,6 +11,7 @@ from aws_cdk import aws_ecs_patterns as ecs_patterns
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda
 from aws_cdk import aws_logs as logs
+from aws_cdk import core
 from aws_cdk.aws_apigatewayv2_integrations_alpha import HttpLambdaIntegration
 from config import StackSettings
 from constructs import Construct

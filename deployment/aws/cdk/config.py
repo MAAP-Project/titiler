@@ -26,7 +26,7 @@ class StackSettings(pydantic.BaseSettings):
         "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES",
         "GDAL_HTTP_MULTIPLEX": "YES",
         "GDAL_HTTP_VERSION": "2",
-        "GDAL_BAND_BLOCK_CACHE":"HASHSET",
+        "GDAL_BAND_BLOCK_CACHE": "HASHSET",
         "PYTHONWARNINGS": "ignore",
         "VSI_CACHE": "TRUE",
         "VSI_CACHE_SIZE": "5000000",  # 5 MB (per file-handle)

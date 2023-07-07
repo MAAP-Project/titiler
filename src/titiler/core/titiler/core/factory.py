@@ -17,7 +17,7 @@ from morecantile import tms as morecantile_tms
 from morecantile.defaults import TileMatrixSets
 from rasterio.crs import CRS
 from rio_tiler.constants import WGS84_CRS
-from rio_tiler.io import BaseReader, COGReader, MultiBandReader, MultiBaseReader, Reader
+from rio_tiler.io import BaseReader, MultiBandReader, MultiBaseReader, Reader
 from rio_tiler.models import BandStatistics, Bounds, Info
 from rio_tiler.types import ColorMapType
 from rio_tiler.utils import get_array_statistics

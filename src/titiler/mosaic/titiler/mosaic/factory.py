@@ -6,33 +6,38 @@ import os
 import time
 import uuid
 from asyncio import wait_for
-from dataclasses import dataclass, field
-from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
-from urllib.parse import urlencode, urlparse
-
-import morecantile
 from dataclasses import dataclass
-from typing import Callable, Dict, Literal, Optional, Type, Union
+from functools import partial
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Union
 from urllib.parse import urlencode
 
+import morecantile
 import rasterio
 from cogeo_mosaic.backends import BaseBackend, DynamoDBBackend, MosaicBackend
 from cogeo_mosaic.errors import MosaicError
 from cogeo_mosaic.models import Info as mosaicInfo
 from cogeo_mosaic.mosaic import MosaicJSON
-from fastapi import Depends, HTTPException, Path, Query
+from fastapi import Depends, Header, HTTPException, Path, Query
 from geojson_pydantic.features import Feature
-from pystac_client import Client
 from geojson_pydantic.geometries import Polygon
 from morecantile import tms
 from morecantile.defaults import TileMatrixSets
+from pystac_client import Client
 from rio_tiler.constants import MAX_THREADS
-from rio_tiler.io import BaseReader, MultiBandReader, MultiBaseReader, Reader, COGReader
+from rio_tiler.io import BaseReader, COGReader, MultiBandReader, MultiBaseReader, Reader
 from rio_tiler.models import Bounds
 from rio_tiler.mosaic.methods.base import MosaicMethodBase
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response
+from starlette.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_409_CONFLICT,
+    HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
 
 from titiler.core.dependencies import DefaultDependency
 from titiler.core.factory import BaseTilerFactory, img_endpoint_params
@@ -53,21 +58,6 @@ from titiler.mosaic.resources.models import (
 
 from .settings import mosaic_config
 
-from fastapi import Depends, Header, HTTPException, Path, Query
-
-from starlette.requests import Request
-from starlette.responses import Response
-from starlette.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
-    HTTP_405_METHOD_NOT_ALLOWED,
-    HTTP_409_CONFLICT,
-    HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-    HTTP_500_INTERNAL_SERVER_ERROR,
-)
 
 # This code is copied from marblecutter
 #  https://github.com/mojodna/marblecutter/blob/master/marblecutter/stats.py
@@ -79,10 +69,12 @@ from starlette.status import (
 # Modified work Copyright 2017 Mapzen
 class Timer(object):
     """Time a code block."""
+
     def __enter__(self):
         """Starts timer."""
         self.start = time.time()
         return self
+
     def __exit__(self, ty, val, tb):
         """Stops timer."""
         self.end = time.time()
@@ -92,6 +84,7 @@ class Timer(object):
     def from_start(self):
         """Return time elapsed from start."""
         return time.time() - self.start
+
 
 # BaseBackend does not support other TMS than WebMercator
 mosaic_tms = TileMatrixSets({"WebMercatorQuad": tms.get("WebMercatorQuad")})
@@ -767,7 +760,8 @@ class MosaicTilerFactory(BaseTilerFactory):
                     return mk_mosaic_entity(mosaic_id=mosaic_id, self_uri=self_uri)
                 else:
                     raise HTTPException(
-                        HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
+                        HTTP_404_NOT_FOUND,
+                        "Error: mosaic with given ID does not exist.",
                     )
 
         @self.router.get(
@@ -792,7 +786,8 @@ class MosaicTilerFactory(BaseTilerFactory):
                     return m
                 else:
                     raise HTTPException(
-                        HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
+                        HTTP_404_NOT_FOUND,
+                        "Error: mosaic with given ID does not exist.",
                     )
 
         # derived from cogeo.xyz
@@ -864,7 +859,8 @@ class MosaicTilerFactory(BaseTilerFactory):
                     )
                 else:
                     raise HTTPException(
-                        HTTP_404_NOT_FOUND, "Error: mosaic with given ID does not exist."
+                        HTTP_404_NOT_FOUND,
+                        "Error: mosaic with given ID does not exist.",
                     )
 
         @self.router.post(
@@ -895,16 +891,16 @@ class MosaicTilerFactory(BaseTilerFactory):
             # duplicate IDs are unlikely to exist, but handle it just to be safe
             try:
                 with rasterio.Env(**env):
-                    await store(mosaic_id, mosaicjson, overwrite=False)
-            except StoreException:
+                    await store(mosaic_id, mosaicjson, env, overwrite=False)
+            except StoreException as e:
                 raise HTTPException(
                     HTTP_409_CONFLICT, "Error: mosaic with given ID already exists"
-                )
+                ) from e
             except Exception as e:
                 logging.error(f"could not save mosaic: {e}")
                 raise HTTPException(
                     HTTP_500_INTERNAL_SERVER_ERROR, "Error: could not save mosaic"
-                )
+                ) from e
 
             self_uri = self.url_for(request, "get_mosaic", mosaic_id=mosaic_id)
 
@@ -946,7 +942,7 @@ class MosaicTilerFactory(BaseTilerFactory):
         #         raise HTTPException(
         #             HTTP_500_INTERNAL_SERVER_ERROR, "Error: could not update mosaic."
         #         )
-        # 
+        #
         #     return
 
         # note: cogeo-mosaic doesn't clear the cache on write/delete, so these will stay until the TTL expires
@@ -1028,11 +1024,11 @@ class MosaicTilerFactory(BaseTilerFactory):
                         ),
                         30,  # todo: ???
                     )
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError as e:
                 raise HTTPException(
                     HTTP_500_INTERNAL_SERVER_ERROR,
                     "Error: timeout executing rendering tile.",
-                )
+                ) from e
 
             headers: Dict[str, str] = {}
 
@@ -1221,11 +1217,11 @@ class MosaicTilerFactory(BaseTilerFactory):
                     ),
                     20,
                 )
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError as e:
                 raise HTTPException(
                     HTTP_500_INTERNAL_SERVER_ERROR,
                     "Error: timeout reading URLs and generating MosaicJSON definition",
-                )
+                ) from e
 
             if mosaicjson is None:
                 raise HTTPException(
@@ -1240,7 +1236,7 @@ class MosaicTilerFactory(BaseTilerFactory):
 
             return mosaicjson
 
-        async def mosaicjson_from_stac_api_query(
+        async def mosaicjson_from_stac_api_query(  # noqa: C901
             req: StacApiQueryRequestBody,
         ) -> MosaicJSON:
             """Create a mosaic for the given parameters"""
@@ -1259,16 +1255,16 @@ class MosaicTilerFactory(BaseTilerFactory):
                         ),
                         30,
                     )
-                except asyncio.TimeoutError:
+                except asyncio.TimeoutError as e:
                     raise HTTPException(
                         HTTP_500_INTERNAL_SERVER_ERROR,
                         "Error: timeout executing STAC API search.",
-                    )
+                    ) from e
                 except TooManyResultsException as e:
                     raise HTTPException(
                         HTTP_400_BAD_REQUEST,
                         f"Error: too many results from STAC API Search: {e}",
-                    )
+                    ) from e
 
                 if not features:
                     raise HTTPException(
@@ -1286,11 +1282,11 @@ class MosaicTilerFactory(BaseTilerFactory):
                         ),
                         60,  # todo: how much time should/can it take?
                     )
-                except asyncio.TimeoutError:
+                except asyncio.TimeoutError as e:
                     raise HTTPException(
                         HTTP_500_INTERNAL_SERVER_ERROR,
                         "Error: timeout reading a COG asset and generating MosaicJSON definition",
-                    )
+                    ) from e
 
                 if mosaicjson is None:
                     raise HTTPException(
@@ -1308,7 +1304,9 @@ class MosaicTilerFactory(BaseTilerFactory):
             except HTTPException as e:
                 raise e
             except Exception as e:
-                raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR, f"Error: {e}")
+                raise HTTPException(
+                    HTTP_500_INTERNAL_SERVER_ERROR, f"Error: {e}"
+                ) from e
 
         MAX_ITEMS = 1000
 
@@ -1321,7 +1319,9 @@ class MosaicTilerFactory(BaseTilerFactory):
                     bbox=mosaic_request.bbox,
                     intersects=mosaic_request.intersects,
                     query=mosaic_request.query,
-                    max_items=mosaic_request.max_items if mosaic_request.max_items and mosaic_request.max_items < MAX_ITEMS else MAX_ITEMS,
+                    max_items=mosaic_request.max_items
+                    if mosaic_request.max_items and mosaic_request.max_items < MAX_ITEMS
+                    else MAX_ITEMS,
                     limit=mosaic_request.limit if mosaic_request.limit else 100,
                 )
                 # matched = search_result.matched()
@@ -1334,7 +1334,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             except TooManyResultsException as e:
                 raise e
             except Exception as e:
-                raise Exception(f"STAC Search error: {e}")
+                raise Exception(f"STAC Search error: {e}") from e
 
         # assumes all assets are uniform. get the min and max zoom from the first.
         def extract_mosaicjson_from_features(
@@ -1356,12 +1356,14 @@ class MosaicTilerFactory(BaseTilerFactory):
                 # supermercado/burntiles.py ", line 38, in _feature_extrema
                 # as this method only handles Polygon, LineString, and Point :grimace:
                 # https://github.com/mapbox/supermercado/issues/47
-                except UnboundLocalError:
+                except UnboundLocalError as e:
                     raise Exception(
                         "STAC Items likely have MultiPolygon geometry, and only Polygon is supported."
-                    )
+                    ) from e
                 except Exception as e:
-                    raise Exception(f"Error extracting mosaic data from results: {e}")
+                    raise Exception(
+                        f"Error extracting mosaic data from results: {e}"
+                    ) from e
             else:
                 return None
 
@@ -1381,10 +1383,10 @@ class MosaicTilerFactory(BaseTilerFactory):
                 return f"{mosaic_config.backend}{mosaic_config.host}/{mosaic_id}{mosaic_config.format}"
 
         async def store(
-            mosaic_id: str, mosaicjson: MosaicJSON, overwrite: bool
+            mosaic_id: str, mosaicjson: MosaicJSON, env, overwrite: bool
         ) -> None:
             try:
-                existing = await retrieve(mosaic_id)
+                existing = await retrieve(mosaic_id, env)
             except Exception:
                 existing = False
 
@@ -1406,11 +1408,11 @@ class MosaicTilerFactory(BaseTilerFactory):
                     ),
                     20,
                 )
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError as e:
                 raise HTTPException(
                     HTTP_500_INTERNAL_SERVER_ERROR,
                     "Error: timeout storing mosaic in datastore",
-                )
+                ) from e
 
         def mosaic_write(
             mosaic_uri: str, mosaicjson: MosaicJSON, overwrite: bool
@@ -1434,15 +1436,17 @@ class MosaicTilerFactory(BaseTilerFactory):
                     ),
                     20,
                 )
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError as e:
                 raise HTTPException(
                     HTTP_500_INTERNAL_SERVER_ERROR,
                     "Error: timeout retrieving mosaic from datastore.",
-                )
+                ) from e
             except MosaicError:
                 return None
 
-        def read_mosaicjson_sync(mosaic_uri: str, reader_params, include_tiles: bool) -> MosaicJSON:
+        def read_mosaicjson_sync(
+            mosaic_uri: str, reader_params, include_tiles: bool
+        ) -> MosaicJSON:
 
             with self.reader(
                 mosaic_uri,
@@ -1465,10 +1469,10 @@ class MosaicTilerFactory(BaseTilerFactory):
                     ),
                     20,
                 )
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError as e:
                 raise HTTPException(
                     HTTP_500_INTERNAL_SERVER_ERROR, "Error: timeout deleting mosaic."
-                )
+                ) from e
 
             return
 
@@ -1476,7 +1480,6 @@ class MosaicTilerFactory(BaseTilerFactory):
             with self.reader(
                 mosaic_uri,
                 reader=self.dataset_reader,
-                reader_options={**reader_params},
                 **self.backend_options,
             ) as mosaic:
                 if isinstance(mosaic, DynamoDBBackend):

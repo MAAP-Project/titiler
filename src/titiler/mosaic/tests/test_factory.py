@@ -8,27 +8,28 @@ from io import BytesIO
 from typing import Optional
 
 import attr
-import numpy
 import morecantile
+import numpy
 from cogeo_mosaic.backends import FileBackend
 from cogeo_mosaic.errors import NoAssetFoundError
 from cogeo_mosaic.mosaic import MosaicJSON
-from pytest import raises
 from fastapi import FastAPI
-from starlette.testclient import TestClient
 from morecantile.defaults import TileMatrixSets
+from pytest import raises
+from starlette.testclient import TestClient
 
 from titiler.core.dependencies import DefaultDependency
 from titiler.core.resources.enums import OptionalHeader
 from titiler.mosaic.factory import MosaicTilerFactory
-from titiler.mosaic.settings import mosaic_config
 from titiler.mosaic.resources.enums import PixelSelectionMethod
+from titiler.mosaic.settings import mosaic_config
 
 from .conftest import DATA_DIR
 
 assets = [os.path.join(DATA_DIR, asset) for asset in ["cog1.tif", "cog2.tif"]]
 
 WEB_TMS = TileMatrixSets({"WebMercatorQuad": morecantile.tms.get("WebMercatorQuad")})
+
 
 @contextmanager
 def tmpmosaic():
@@ -446,6 +447,7 @@ def test_mosaics_create(set_env, client):
             },
         )
         assert r.status_code == 400
+
 
 @dataclass
 class BackendParams(DefaultDependency):
