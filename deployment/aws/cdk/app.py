@@ -82,7 +82,7 @@ class titilerLambdaStack(Stack):
             self,
             f"{id}-endpoint",
             default_integration=HttpLambdaIntegration(
-                f"{id}-hli", handler=lambda_function
+                f"{id}-integration", handler=lambda_function
             ),
         )
         CfnOutput(self, "Endpoint", value=api.url)
