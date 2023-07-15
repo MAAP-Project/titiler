@@ -9,10 +9,10 @@ from rasterio.io import MemoryFile
 from ..conftest import mock_rasterio_open, mock_RequestGet
 
 
-@patch("rio_tiler.io.stac.requests")
-def test_bounds(requests, app):
+@patch("rio_tiler.io.stac.httpx")
+def test_bounds(httpx, app):
     """test /bounds endpoint."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
 
     response = app.get("/stac/bounds?url=https://myurl.com/item.json")
     assert response.status_code == 200
@@ -20,24 +20,32 @@ def test_bounds(requests, app):
     assert len(body["bounds"]) == 4
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_info(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_info(httpx, rio, app):
     """test /info endpoint."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     response = app.get("/stac/assets?url=https://myurl.com/item.json")
     assert response.status_code == 200
     body = response.json()
-    assert len(body) == 17
+    assert len(body) == 2
 
     response = app.get("/stac/info?url=https://myurl.com/item.json&assets=B01")
     assert response.status_code == 200
     body = response.json()
     assert body["B01"]
 
-    response = app.get("/stac/info?url=https://myurl.com/item.json&assets=B01,B09")
+    response = app.get("/stac/info?url=https://myurl.com/item.json")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["B01"]
+    assert body["B09"]
+
+    response = app.get(
+        "/stac/info?url=https://myurl.com/item.json&assets=B01&assets=B09"
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["B01"]
@@ -49,27 +57,7 @@ def test_info(requests, rio, app):
     assert response.headers["content-type"] == "application/geo+json"
     body = response.json()
     assert body["geometry"]
-    assert body["properties"]["dataset"] == "https://myurl.com/item.json"
-    assert body["properties"]["assets"]["B01"]
-
-
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_metadata(requests, rio, app):
-    """test /metadata endpoint."""
-    requests.get = mock_RequestGet
-    rio.open = mock_rasterio_open
-
-    response = app.get("/stac/metadata?url=https://myurl.com/item.json&assets=B01")
-    assert response.status_code == 200
-    body = response.json()
-    assert body["B01"]
-
-    response = app.get("/stac/metadata?url=https://myurl.com/item.json&assets=B01,B09")
-    assert response.status_code == 200
-    body = response.json()
-    assert body["B01"]
-    assert body["B09"]
+    assert body["properties"]["B01"]
 
 
 def parse_img(content: bytes) -> Dict:
@@ -79,11 +67,11 @@ def parse_img(content: bytes) -> Dict:
             return dst.meta
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_tile(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_tile(httpx, rio, app):
     """test tile endpoints."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     # Missing assets
@@ -100,7 +88,7 @@ def test_tile(requests, rio, app):
     assert meta["height"] == 256
 
     response = app.get(
-        "/stac/tiles/9/289/207?url=https://myurl.com/item.json&expression=B01&rescale=0,1000"
+        "/stac/tiles/9/289/207?url=https://myurl.com/item.json&expression=B01_b1&rescale=0,1000"
     )
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
@@ -109,11 +97,11 @@ def test_tile(requests, rio, app):
     assert meta["height"] == 256
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_tilejson(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_tilejson(httpx, rio, app):
     """test /tilejson endpoint."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     response = app.get("/stac/tilejson.json?url=https://myurl.com/item.json")
@@ -146,11 +134,11 @@ def test_tilejson(requests, rio, app):
     )
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_preview(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_preview(httpx, rio, app):
     """test preview endpoints."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     # Missing Assets or Expression
@@ -176,7 +164,7 @@ def test_preview(requests, rio, app):
     assert meta["height"] == 128
 
     response = app.get(
-        "/stac/preview?url=https://myurl.com/item.json&expression=B01&rescale=0,1000&max_size=64"
+        "/stac/preview?url=https://myurl.com/item.json&expression=B01_b1&rescale=0,1000&max_size=64"
     )
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
@@ -185,11 +173,11 @@ def test_preview(requests, rio, app):
     assert meta["height"] == 64
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_part(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_part(httpx, rio, app):
     """test crop endpoints."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     # Missing Assets or Expression
@@ -217,7 +205,7 @@ def test_part(requests, rio, app):
     assert meta["height"] == 128
 
     response = app.get(
-        "/stac/crop/23.878,32.063,23.966,32.145.png?url=https://myurl.com/item.json&expression=B01&rescale=0,1000&max_size=64"
+        "/stac/crop/23.878,32.063,23.966,32.145.png?url=https://myurl.com/item.json&expression=B01_b1&rescale=0,1000&max_size=64"
     )
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
@@ -226,11 +214,11 @@ def test_part(requests, rio, app):
     assert meta["height"] == 14
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_point(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_point(httpx, rio, app):
     """test crop endpoints."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     # Missing Assets or Expression
@@ -243,30 +231,32 @@ def test_point(requests, rio, app):
     assert response.status_code == 200
     body = response.json()
     assert body["coordinates"] == [23.878, 32.063]
-    assert body["values"] == [[3565]]
-
-    # response = app.get(
-    #     "/stac/point/23.878,32.063?url=https://myurl.com/item.json&assets=B01&asset_expression=b1*2"
-    # )
-    # assert response.status_code == 200
-    # body = response.json()
-    # assert body["coordinates"] == [23.878, 32.063]
-    # assert body["values"] == [[7130]]
+    assert body["values"] == [3565]
+    assert body["band_names"] == ["B01_b1"]
 
     response = app.get(
-        "/stac/point/23.878,32.063?url=https://myurl.com/item.json&expression=B01/B09"
+        "/stac/point/23.878,32.063?url=https://myurl.com/item.json&expression=B01_b1*2"
     )
     assert response.status_code == 200
     body = response.json()
     assert body["coordinates"] == [23.878, 32.063]
-    assert round(body["values"][0][0], 2) == 0.49
+    assert body["values"] == [7130]
+    assert body["band_names"] == ["B01_b1*2"]
+
+    response = app.get(
+        "/stac/point/23.878,32.063?url=https://myurl.com/item.json&expression=B01_b1/B09_b1"
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["coordinates"] == [23.878, 32.063]
+    assert round(body["values"][0], 2) == 0.49
 
 
-@patch("rio_tiler.io.cogeo.rasterio")
-@patch("rio_tiler.io.stac.requests")
-def test_missing_asset_not_found(requests, rio, app):
+@patch("rio_tiler.io.rasterio.rasterio")
+@patch("rio_tiler.io.stac.httpx")
+def test_missing_asset_not_found(httpx, rio, app):
     """test /info endpoint."""
-    requests.get = mock_RequestGet
+    httpx.get = mock_RequestGet
     rio.open = mock_rasterio_open
 
     response = app.get(

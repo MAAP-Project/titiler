@@ -22,15 +22,15 @@ class StackSettings(pydantic.BaseSettings):
         "CPL_VSIL_CURL_CACHE_SIZE": "200000000",
         "GDAL_CACHEMAX": "200",  # 200 mb
         "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
+        "GDAL_INGESTED_BYTES_AT_OPEN": "32770",  # size of Landsat 8 header
         "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES",
         "GDAL_HTTP_MULTIPLEX": "YES",
         "GDAL_HTTP_VERSION": "2",
-        "GDAL_BAND_BLOCK_CACHE":"HASHSET",
+        "GDAL_BAND_BLOCK_CACHE": "HASHSET",
         "PYTHONWARNINGS": "ignore",
         "VSI_CACHE": "TRUE",
         "VSI_CACHE_SIZE": "5000000",  # 5 MB (per file-handle)
         "AWS_REQUEST_PAYER": "requester",
-        "GDAL_INGESTED_BYTES_AT_OPEN": "32770" # size of Landsat 8 header
     }
 
     # S3 bucket names where TiTiler could do HEAD and GET Requests

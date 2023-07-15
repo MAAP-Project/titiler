@@ -1,9 +1,3 @@
-# Ignore cdk folder
-cdk.out/
-.history
-.tox
-.git
-.vscode
-node_modules/
+cdk.out
+node_modules
 .mypy_cache
-.pytest_cache

@@ -7,7 +7,6 @@ from typing import Any, Dict
 import pytest
 import rasterio
 from rasterio.io import MemoryFile
-
 from starlette.testclient import TestClient
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
@@ -42,6 +41,9 @@ def mock_RequestGet(src_path):
 
         def json(self):
             return json.loads(self.data)
+
+        def raise_for_status(self):
+            return True
 
     assert src_path.startswith("https://myurl.com/")
     stac_path = os.path.basename(src_path)

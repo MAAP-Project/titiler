@@ -5,16 +5,13 @@ from enum import Enum
 from typing import Dict, Optional
 
 import morecantile
+from fastapi import HTTPException, Query
 from morecantile import tms
 from morecantile.models import TileMatrixSet
 
 # rasterio switched to using pyproj 1.3
 from pyproj import CRS
-
 from rio_tiler.colormap import cmap, parse_color
-
-from fastapi import HTTPException, Query
-
 from starlette.templating import Jinja2Templates
 
 try:
@@ -83,10 +80,10 @@ def ColorMapParams(
                 colormap,
                 object_hook=lambda x: {int(k): parse_color(v) for k, v in x.items()},
             )
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as err:
             raise HTTPException(
                 status_code=400, detail="Could not parse the colormap value."
-            )
+            ) from err
 
     return None
 

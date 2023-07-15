@@ -1,10 +1,13 @@
 """Titiler.mosaic Models."""
 
 import re
-from typing import List, Optional, Dict, Any
+from enum import auto
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, validator
 from stac_pydantic.api.search import ExtendedSearch
+from stac_pydantic.utils import AutoValueEnum
+
 
 def to_camel(snake_str: str) -> str:
     """
@@ -37,8 +40,6 @@ rfc3339_regex_str = (
 )
 rfc3339_regex = re.compile(rfc3339_regex_str)
 
-from enum import auto
-from stac_pydantic.utils import AutoValueEnum
 
 # copied from stac_pydantic, because the neq, lte, and gte were wrong (ne, le, and ge)
 class Operator(str, AutoValueEnum):

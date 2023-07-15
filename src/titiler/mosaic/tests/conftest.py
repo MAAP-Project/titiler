@@ -4,15 +4,13 @@ import os
 from typing import Any, Dict
 
 import pytest
+from fastapi import FastAPI
 from rasterio.io import MemoryFile
+from starlette.testclient import TestClient
 
 from titiler.core.resources.enums import OptionalHeader
 from titiler.mosaic.factory import MosaicTilerFactory
 from titiler.mosaic.settings import mosaic_config
-
-from fastapi import FastAPI
-
-from starlette.testclient import TestClient
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
