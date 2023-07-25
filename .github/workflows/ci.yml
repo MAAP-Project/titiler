@@ -109,7 +109,7 @@ jobs:
   release:
     needs: [tests]
     name: Create GitHub Release
-    if: github.event_name == 'release'
+    if: startsWith(github.event.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
@@ -119,15 +119,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set tag name
+      - name: Get release tag name
         id: tag
-        run: |
-          if [[ "${{ github.event_name }}" != "push" ]]; then
-            tag=v$(date +%Y%m%d.%H%M%S)
-          else
-            tag=$(basename "${{ github.ref }}")
-          fi
-          echo "tag=$tag" >> $GITHUB_OUTPUT
+        run: echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
 
       - name: Create Draft Release
         id: create_release
@@ -137,11 +131,13 @@ jobs:
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           release_name: ${{ steps.tag.outputs.tag }}
+          body_path: CHANGES.md
           draft: true
           prerelease: false
 
   build-lambda:
     needs: [release]
+    name: Build Release Lambda
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -170,17 +166,6 @@ jobs:
           asset_path: lambda.zip
           asset_name: lambda-python3.9.zip
           asset_content_type: application/zip
-
-  metadata:
-    name: Publish Release
-    needs: [release, build-lambda]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: eregon/publish-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release_id: ${{ needs.release.outputs.release_id }}
 
   publish-docker:
     needs: [tests]
