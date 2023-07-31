@@ -22,9 +22,9 @@ RUN pip install \
         # pin markupsafe so jinja will have access to soft_unicode
         # https://github.com/aws/aws-sam-cli/issues/3661#issuecomment-1044340547
         markupsafe==2.0.1 \
-        titiler.application==0.11.7 \
-        titiler.mosaic==0.11.7 \
-        titiler.core==0.11.7 \
+        titiler.application==0.12.0 \
+        titiler.mosaic==0.12.0 \
+        titiler.core==0.12.0 \
         -t /var/task --no-binary pydantic
         # original code also had --no-binary numpy, which takes 20-30 minutes to build
 
