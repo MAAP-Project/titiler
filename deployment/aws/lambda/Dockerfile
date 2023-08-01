@@ -16,9 +16,9 @@ RUN pip install \
         # causing 500 responses. Rasterio <1.3 seemed to be the culprit for that,
         # and rasterio 1.3 has better packages for curl, openssl, and/or gdal
         rasterio==1.3.6 \
-        morecantile==3.2.5 \
-        rio-tiler==4.1.9 \
-        cogeo-mosaic==5.1.1 \
+        morecantile==4.3.0 \
+        rio-tiler==5.0.3 \
+        cogeo-mosaic==6.2.0 \
         # pin markupsafe so jinja will have access to soft_unicode
         # https://github.com/aws/aws-sam-cli/issues/3661#issuecomment-1044340547
         markupsafe==2.0.1 \

@@ -21,9 +21,9 @@ python -m pip install \
   ./src/titiler/application \
   mangum==0.17.0 \
   rasterio==1.3.6 \
-  morecantile==3.2.5 \
-  rio-tiler==4.1.9 \
-  cogeo-mosaic==5.1.1 \
+  morecantile==4.3.0 \
+  rio-tiler==5.0.3 \
+  cogeo-mosaic==6.2.0 \
   markupsafe==2.0.1
 
 cd lambda
