@@ -1,12 +1,13 @@
 # Development - Contributing
 
-Issues and pull requests are more than welcome: https://github.com/developmentseed/titiler/issues
+For most issues, we recommend opening a PR against the upstream Devseed project.  We still pull from the upstream frequently.
+https://github.com/developmentseed/titiler/issues
 
 **dev install**
 
 ```bash
-git clone https://github.com/developmentseed/titiler.git
-cd titiler
+git clone https://github.com/Element84/titiler-mosaicjson.git
+cd titiler-mosaicjson
 
 python -m pip install \
    pre-commit \
@@ -45,7 +46,7 @@ python -m pytest src/titiler/application --cov=titiler.application --cov-report=
 ### Docs
 
 ```bash
-git clone https://github.com/developmentseed/titiler.git
+git clone https://github.com/Element84/titiler-mosaicjson.git
 cd titiler
 python -m pip install nbconvert mkdocs mkdocs-material mkdocs-jupyter pygments pdocs
 ```
