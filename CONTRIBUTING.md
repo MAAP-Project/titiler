@@ -1,6 +1,6 @@
 # Development - Contributing
 
-For most issues, we recommend opening a PR against the upstream Devseed project.  We still pull from the upstream frequently.
+For most issues, we recommend opening a PR against the upstream TiTiler project maintained by Development Seed. We still pull from the upstream frequently.
 https://github.com/developmentseed/titiler/issues
 
 **dev install**
