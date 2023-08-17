@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.12.0-1.0.1 (2023-08-16)
+
+* add boto3 package to lambda zip to satisfy use of dynamodb for mosaic
+
 ## 0.12.0-1.0.0 (2023-08-15)
 
 * introduce new split versioning scheme that represents the upstream titiler version (v0.12.0) and the mosaic version (1.0.0)

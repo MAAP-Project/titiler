@@ -28,7 +28,8 @@ python -m pip install \
   morecantile==4.3.0 \
   rio-tiler==5.0.3 \
   cogeo-mosaic==6.2.0 \
-  markupsafe==2.0.1
+  markupsafe==2.0.1 \
+  boto3==1.28.27
 
 cd lambda
 
