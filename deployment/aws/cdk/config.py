@@ -2,35 +2,31 @@
 
 from typing import Dict, List, Optional
 
-import pydantic
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class StackSettings(pydantic.BaseSettings):
+class StackSettings(BaseSettings):
     """Application settings"""
 
     name: str = "titiler"
     stage: str = "production"
 
-    owner: Optional[str]
-    client: Optional[str]
+    owner: Optional[str] = None
+    client: Optional[str] = None
 
     # Default options are optimized for CloudOptimized GeoTIFF
     # For more information on GDAL env see: https://gdal.org/user/configoptions.html
     # or https://developmentseed.org/titiler/advanced/performance_tuning/
     env: Dict = {
-        "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif,.TIF,.tiff",
-        "CPL_VSIL_CURL_CACHE_SIZE": "200000000",
         "GDAL_CACHEMAX": "200",  # 200 mb
         "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
-        "GDAL_INGESTED_BYTES_AT_OPEN": "32770",  # size of Landsat 8 header
+        "GDAL_INGESTED_BYTES_AT_OPEN": "32768",  # get more bytes when opening the files.
         "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES",
         "GDAL_HTTP_MULTIPLEX": "YES",
         "GDAL_HTTP_VERSION": "2",
-        "GDAL_BAND_BLOCK_CACHE": "HASHSET",
         "PYTHONWARNINGS": "ignore",
         "VSI_CACHE": "TRUE",
         "VSI_CACHE_SIZE": "5000000",  # 5 MB (per file-handle)
-        "AWS_REQUEST_PAYER": "requester",
     }
 
     # S3 bucket names where TiTiler could do HEAD and GET Requests
@@ -74,7 +70,7 @@ class StackSettings(pydantic.BaseSettings):
     # Override the automatic definition of number of workers.
     # Set to the number of CPU cores in the current server multiplied by the environment variable WORKERS_PER_CORE.
     # So, in a server with 2 cores, by default it will be set to 2.
-    web_concurrency: Optional[int]
+    web_concurrency: Optional[int] = None
 
     image_version: str = "latest"
 
@@ -82,21 +78,11 @@ class StackSettings(pydantic.BaseSettings):
     # AWS LAMBDA
     # The following settings only apply to AWS Lambda deployment
     # more about lambda config: https://www.sentiatechblog.com/aws-re-invent-2020-day-3-optimizing-lambda-cost-with-multi-threading
-    timeout: int = 60  # MosaicJSON creation takes much more time than tile creation
+    timeout: int = 10
     memory: int = 1536
 
     # The maximum of concurrent executions you want to reserve for the function.
     # Default: - No specific limit - account limit.
-    max_concurrent: Optional[int]
+    max_concurrent: Optional[int] = None
 
-    mosaic_backend: str
-    mosaic_host: str
-    mosaic_format: str = ".json.gz"  # format will be ignored for dynamodb backend
-
-    permissions_boundary_name: Optional[str]
-
-    class Config:
-        """model config"""
-
-        env_file = ".env"
-        env_prefix = "TITILER_STACK_"
+    model_config = SettingsConfigDict(env_prefix="TITILER_STACK_", env_file=".env")

@@ -1,6 +1,4 @@
 """Test titiler.application.main.app."""
-from fastapi import FastAPI
-from starlette.testclient import TestClient
 
 
 def test_health(app):
@@ -9,8 +7,8 @@ def test_health(app):
     assert response.status_code == 200
     assert response.json() == {"ping": "pong!"}
 
-    response = TestClient(FastAPI()).get("/openapi.json")
+    response = app.get("/api")
     assert response.status_code == 200
 
-    response = app.get("/docs")
+    response = app.get("/api.html")
     assert response.status_code == 200

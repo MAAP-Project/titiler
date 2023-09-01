@@ -58,6 +58,7 @@ def test_MosaicTilerFactory():
     client = TestClient(app)
 
     response = TestClient(FastAPI()).get("/openapi.json")
+    response = client.get("/openapi.json")
     assert response.status_code == 200
 
     response = client.get("/docs")
@@ -108,7 +109,7 @@ def test_MosaicTilerFactory():
 
         response = client.get(
             "/mosaic/point/-7903683.846322423,5780349.220256353",
-            params={"url": mosaic_file, "coord-crs": "epsg:3857"},
+            params={"url": mosaic_file, "coord_crs": "epsg:3857"},
         )
         assert response.status_code == 200
 
@@ -189,7 +190,7 @@ def test_MosaicTilerFactory():
 
         response = client.post(
             "/mosaic/validate",
-            json=MosaicJSON.from_urls(assets).dict(),
+            json=MosaicJSON.from_urls(assets).model_dump(),
         )
         assert response.status_code == 200
 
@@ -221,7 +222,7 @@ def test_MosaicTilerFactory():
 
         response = client.get(
             "/mosaic/-7903683.846322423,5780349.220256353/assets",
-            params={"url": mosaic_file, "coord-crs": "epsg:3857"},
+            params={"url": mosaic_file, "coord_crs": "epsg:3857"},
         )
         assert response.status_code == 200
         assert all(
@@ -241,7 +242,7 @@ def test_MosaicTilerFactory():
 
         response = client.get(
             "/mosaic/-8453323.83211421,5322463.153553393,-8140237.76425813,5635549.221409473/assets",
-            params={"url": mosaic_file, "coord-crs": "epsg:3857"},
+            params={"url": mosaic_file, "coord_crs": "epsg:3857"},
         )
         assert response.status_code == 200
         assert all(

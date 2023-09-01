@@ -1,7 +1,6 @@
 """Common dependency."""
 
 import json
-import sys
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, List, Optional, Sequence, Tuple, Union
@@ -12,12 +11,7 @@ from rasterio.crs import CRS
 from rio_tiler.colormap import cmap, parse_color
 from rio_tiler.errors import MissingAssets, MissingBands
 from rio_tiler.types import ColorMapType, RIOResampling
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Annotated
-
+from typing_extensions import Annotated
 
 ColorMapName = Enum(  # type: ignore
     "ColorMapName", [(a, a) for a in sorted(cmap.list())]
@@ -492,7 +486,7 @@ def CoordCRSParams(
     crs: Annotated[
         Optional[str],
         Query(
-            alias="coord-crs",
+            alias="coord_crs",
             description="Coordinate Reference System of the input coords. Default to `epsg:4326`.",
         ),
     ] = None,
@@ -508,7 +502,7 @@ def DstCRSParams(
     crs: Annotated[
         Optional[str],
         Query(
-            alias="dst-crs",
+            alias="dst_crs",
             description="Output Coordinate Reference System.",
         ),
     ] = None,
@@ -518,3 +512,30 @@ def DstCRSParams(
         return CRS.from_user_input(crs)
 
     return None
+
+
+def BufferParams(
+    buffer: Annotated[
+        Optional[float],
+        Query(
+            gt=0,
+            title="Tile buffer.",
+            description="Buffer on each side of the given tile. It must be a multiple of `0.5`. Output **tilesize** will be expanded to `tilesize + 2 * buffer` (e.g 0.5 = 257x257, 1.0 = 258x258).",
+        ),
+    ] = None,
+) -> Optional[float]:
+    """Tile buffer Parameter."""
+    return buffer
+
+
+def ColorFormulaParams(
+    color_formula: Annotated[
+        Optional[str],
+        Query(
+            title="Color Formula",
+            description="rio-color formula (info: https://github.com/mapbox/rio-color)",
+        ),
+    ] = None,
+) -> Optional[str]:
+    """ColorFormula Parameter."""
+    return color_formula

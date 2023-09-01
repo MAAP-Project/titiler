@@ -87,7 +87,6 @@ def test_terrain_algo():
     # MAPBOX Terrain RGB
     response = client.get("/", params={"algorithm": "terrainrgb"})
     assert response.status_code == 200
-
     with MemoryFile(response.content) as mem:
         with mem.open() as dst:
             data = dst.read().astype(numpy.float64)
@@ -99,7 +98,6 @@ def test_terrain_algo():
     # TILEZEN Terrarium
     response = client.get("/", params={"algorithm": "terrarium"})
     assert response.status_code == 200
-
     with MemoryFile(response.content) as mem:
         with mem.open() as dst:
             data = dst.read().astype(numpy.float64)

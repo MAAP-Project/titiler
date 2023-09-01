@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.14.0-1.0.2 (2023-08-16)
+
+* updated from upstream v0.14.0
+
 ## 0.12.0-1.0.1 (2023-08-16)
 
 * add boto3 package to lambda zip to satisfy use of dynamodb for mosaic

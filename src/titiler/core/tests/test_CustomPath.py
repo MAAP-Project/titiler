@@ -6,6 +6,7 @@ import sys
 
 from fastapi import FastAPI, HTTPException, Query
 from starlette.testclient import TestClient
+from typing_extensions import Annotated
 
 from titiler.core.factory import TilerFactory
 

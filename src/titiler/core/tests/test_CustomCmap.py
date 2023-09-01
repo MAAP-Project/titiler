@@ -9,6 +9,7 @@ import numpy
 from fastapi import FastAPI, Query
 from rio_tiler.colormap import ColorMaps
 from starlette.testclient import TestClient
+from typing_extensions import Annotated
 
 from titiler.core.factory import TilerFactory
 
