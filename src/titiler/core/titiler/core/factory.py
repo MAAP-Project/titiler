@@ -1,7 +1,6 @@
 """TiTiler Router factories."""
 
 import abc
-import sys
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Union
 from urllib.parse import urlencode
@@ -69,12 +68,6 @@ from titiler.core.resources.enums import ImageType, MediaType, OptionalHeader
 from titiler.core.resources.responses import GeoJSONResponse, JSONResponse, XMLResponse
 from titiler.core.routing import EndpointScope
 from titiler.core.utils import render_image
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Annotated
-
 
 DEFAULT_TEMPLATES = Jinja2Templates(
     directory="",

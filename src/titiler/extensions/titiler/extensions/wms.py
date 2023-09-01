@@ -1,6 +1,5 @@
 """wms Extension."""
 
-import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List
@@ -21,12 +20,6 @@ from titiler.core.dependencies import ColorFormulaParams, RescalingParams
 from titiler.core.factory import BaseTilerFactory, FactoryExtension
 from titiler.core.resources.enums import ImageType, MediaType
 from titiler.core.utils import render_image
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Annotated
-
 
 DEFAULT_TEMPLATES = Jinja2Templates(
     directory="",

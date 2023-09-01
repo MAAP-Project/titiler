@@ -3,7 +3,6 @@
 import asyncio
 import logging
 import os
-import sys
 import time
 import uuid
 from asyncio import wait_for
@@ -41,7 +40,6 @@ from starlette.status import (
     HTTP_415_UNSUPPORTED_MEDIA_TYPE,
     HTTP_500_INTERNAL_SERVER_ERROR,
 )
-
 from typing_extensions import Annotated
 
 from titiler.core.dependencies import (
@@ -50,7 +48,6 @@ from titiler.core.dependencies import (
     CoordCRSParams,
     DefaultDependency,
 )
-
 from titiler.core.factory import BaseTilerFactory, img_endpoint_params
 from titiler.core.models.mapbox import TileJSON
 from titiler.core.resources.enums import ImageType, MediaType, OptionalHeader
@@ -67,7 +64,7 @@ from titiler.mosaic.resources.models import (
     UrisRequestBody,
 )
 
-from .settings import mosaic_config
+from .settings import MosaicSettings
 
 
 # This code is copied from marblecutter
@@ -95,7 +92,6 @@ class Timer(object):
     def from_start(self):
         """Return time elapsed from start."""
         return time.time() - self.start
-
 
 
 def PixelSelectionParams(
@@ -1398,10 +1394,11 @@ class MosaicTilerFactory(BaseTilerFactory):
                 raise Exception(f"Asset with name '{asset_name}' could not be found.")
 
         def mk_src_path(mosaic_id: str) -> str:
-            if mosaic_config.backend == "dynamodb://":
-                return f"{mosaic_config.backend}{mosaic_config.host}:{mosaic_id}"
+            mosaic_settings = MosaicSettings()
+            if mosaic_settings.backend == "dynamodb://":
+                return f"{mosaic_settings.backend}{mosaic_settings.host}:{mosaic_id}"
             else:
-                return f"{mosaic_config.backend}{mosaic_config.host}/{mosaic_id}{mosaic_config.format}"
+                return f"{mosaic_settings.backend}{mosaic_settings.host}/{mosaic_id}{mosaic_settings.format}"
 
         async def store(
             mosaic_id: str, mosaicjson: MosaicJSON, env, overwrite: bool

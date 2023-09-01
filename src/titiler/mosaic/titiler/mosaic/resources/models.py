@@ -5,8 +5,9 @@ from enum import auto
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, validator
-from stac_pydantic.api.search import ExtendedSearch
-from stac_pydantic.utils import AutoValueEnum
+
+from titiler.mosaic.models.stac_pydantic.search import ExtendedSearch
+from titiler.mosaic.models.stac_pydantic.utils import AutoValueEnum
 
 
 def to_camel(snake_str: str) -> str:
@@ -69,12 +70,12 @@ class StacApiQueryRequestBody(ExtendedSearch):
     version: Optional[str] = None
 
     # overriding limit so we can tell if it's defined or not
-    limit: Optional[int]
+    limit: Optional[int] = 10
 
-    max_items: Optional[int]
+    max_items: Optional[int] = None
 
     # overriding query to use our Operator class rather than the broken stac_pydantic one
-    query: Optional[Dict[str, Dict[Operator, Any]]]
+    query: Optional[Dict[str, Dict[Operator, Any]]] = None
 
     @validator("datetime")
     def validate_datetime(cls, v):

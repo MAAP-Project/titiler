@@ -1,7 +1,6 @@
 """test dependencies."""
 
 import json
-import sys
 from dataclasses import dataclass
 from typing import Literal
 
@@ -14,11 +13,6 @@ from typing_extensions import Annotated
 
 from titiler.core import dependencies, errors
 from titiler.core.resources.responses import JSONResponse
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Annotated
 
 
 def test_tms():
