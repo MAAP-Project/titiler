@@ -20,7 +20,6 @@ from starlette.testclient import TestClient
 from titiler.core.dependencies import DefaultDependency
 from titiler.core.resources.enums import OptionalHeader
 from titiler.mosaic.factory import MosaicTilerFactory
-from titiler.mosaic.settings import mosaic_config
 
 from .conftest import DATA_DIR
 
@@ -108,7 +107,7 @@ def test_MosaicTilerFactory():
 
         response = client.get(
             "/mosaic/point/-7903683.846322423,5780349.220256353",
-            params={"url": mosaic_file, "coord-crs": "epsg:3857"},
+            params={"url": mosaic_file, "coord_crs": "epsg:3857"},
         )
         assert response.status_code == 200
 
@@ -189,7 +188,7 @@ def test_MosaicTilerFactory():
 
         response = client.post(
             "/mosaic/validate",
-            json=MosaicJSON.from_urls(assets).dict(),
+            json=MosaicJSON.from_urls(assets).model_dump(),
         )
         assert response.status_code == 200
 
@@ -221,7 +220,7 @@ def test_MosaicTilerFactory():
 
         response = client.get(
             "/mosaic/-7903683.846322423,5780349.220256353/assets",
-            params={"url": mosaic_file, "coord-crs": "epsg:3857"},
+            params={"url": mosaic_file, "coord_crs": "epsg:3857"},
         )
         assert response.status_code == 200
         assert all(
@@ -241,7 +240,7 @@ def test_MosaicTilerFactory():
 
         response = client.get(
             "/mosaic/-8453323.83211421,5322463.153553393,-8140237.76425813,5635549.221409473/assets",
-            params={"url": mosaic_file, "coord-crs": "epsg:3857"},
+            params={"url": mosaic_file, "coord_crs": "epsg:3857"},
         )
         assert response.status_code == 200
         assert all(
@@ -264,8 +263,17 @@ def _get_link_by_rel(response_body: dict, rel: str) -> str:
     return next((x["href"] for x in response_body["links"] if x["rel"] == rel), "")
 
 
-def test_mosaics_basic(set_env, client):
+def test_mosaics_basic():
     """Test mosaicjson functionality."""
+
+    mosaic = MosaicTilerFactory(
+        optional_headers=[OptionalHeader.x_assets],
+        router_prefix="mosaic",
+    )
+
+    app = FastAPI()
+    app.include_router(mosaic.router, prefix="/mosaic")
+    client = TestClient(app)
 
     # Create a new MosaicJSON
     mosaicjson_data = MosaicJSON.from_urls(assets)
@@ -375,8 +383,17 @@ def test_mosaics_basic(set_env, client):
     # note: in cogeo-mosaic, the cache is not flushed on delete, so the old entry still exists for 5 min
 
 
-def test_mosaics_errors_not_found(set_env, client):
+def test_mosaics_errors_not_found():
     """Test mosaicjson functionality."""
+
+    mosaic = MosaicTilerFactory(
+        optional_headers=[OptionalHeader.x_assets],
+        router_prefix="mosaic",
+    )
+
+    app = FastAPI()
+    app.include_router(mosaic.router, prefix="/mosaic")
+    client = TestClient(app)
 
     # Create a new MosaicJSON
     mosaicjson_data = MosaicJSON.from_urls(assets)
@@ -398,8 +415,17 @@ def test_mosaics_errors_not_found(set_env, client):
     # assert r.status_code == 404
 
 
-def test_mosaics_create(set_env, client):
+def test_mosaics_create():
     """Test mosaicjson functionality."""
+
+    mosaic = MosaicTilerFactory(
+        optional_headers=[OptionalHeader.x_assets],
+        router_prefix="mosaic",
+    )
+
+    app = FastAPI()
+    app.include_router(mosaic.router, prefix="/mosaic")
+    client = TestClient(app)
 
     # Create a new MosaicJSON
     mosaicjson_data = MosaicJSON.from_urls(assets)
@@ -458,11 +484,8 @@ def test_mosaics_create(set_env, client):
     )
     assert r.status_code == 201
 
-    def test_mosaics_create_errors(set_env):
+    def test_mosaics_create_errors():
         """Test mosaicjson functionality."""
-
-        mosaic_config.backend = "file://"
-        mosaic_config.host = "/tmp"
 
         mosaic = MosaicTilerFactory(
             optional_headers=[OptionalHeader.server_timing, OptionalHeader.x_assets],

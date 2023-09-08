@@ -1,15 +1,14 @@
 """wms Extension."""
 
-import sys
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from urllib.parse import urlencode
 
 import jinja2
 import numpy
 import rasterio
-from fastapi import Depends, HTTPException, Query
+from fastapi import Depends, HTTPException
 from rasterio.crs import CRS
 from rio_tiler.mosaic import mosaic_reader
 from rio_tiler.mosaic.methods.base import MosaicMethodBase
@@ -17,15 +16,10 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.templating import Jinja2Templates
 
-from titiler.core.dependencies import RescalingParams
+from titiler.core.dependencies import ColorFormulaParams, RescalingParams
 from titiler.core.factory import BaseTilerFactory, FactoryExtension
 from titiler.core.resources.enums import ImageType, MediaType
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated  # pylint: disable=no-name-in-module
-else:
-    from typing_extensions import Annotated
-
+from titiler.core.utils import render_image
 
 DEFAULT_TEMPLATES = Jinja2Templates(
     directory="",
@@ -277,13 +271,7 @@ class wmsExtension(FactoryExtension):
             dataset_params=Depends(factory.dataset_dependency),
             post_process=Depends(factory.process_dependency),
             rescale=Depends(RescalingParams),
-            color_formula: Annotated[
-                Optional[str],
-                Query(
-                    title="Color Formula",
-                    description="rio-color formula (info: https://github.com/mapbox/rio-color)",
-                ),
-            ] = None,
+            color_formula=Depends(ColorFormulaParams),
             colormap=Depends(factory.colormap_dependency),
             reader_params=Depends(factory.reader_dependency),
             env=Depends(factory.environment_dependency),
@@ -376,7 +364,9 @@ class wmsExtension(FactoryExtension):
                             layers_dict[layer][
                                 "bounds_wgs84"
                             ] = src_dst.geographic_bounds
-                            layers_dict[layer]["abstract"] = src_dst.info().json()
+                            layers_dict[layer][
+                                "abstract"
+                            ] = src_dst.info().model_dump_json()
 
                 # Build information for the whole service
                 minx, miny, maxx, maxy = zip(
@@ -531,13 +521,13 @@ class wmsExtension(FactoryExtension):
                 if colormap:
                     image = image.apply_colormap(colormap)
 
-                content = image.render(
-                    img_format=format.driver,
+                content, media_type = render_image(
+                    image,
+                    output_format=format,
+                    colormap=colormap,
                     add_mask=transparent,
-                    **format.profile,
                 )
-
-                return Response(content, media_type=format.mediatype)
+                return Response(content, media_type=media_type)
 
             elif request_type.lower() == "getfeatureinfo":
                 return Response("Not Implemented", 400)

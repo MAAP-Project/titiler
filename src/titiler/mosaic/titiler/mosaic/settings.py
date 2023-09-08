@@ -1,15 +1,13 @@
 """app settings"""
 
-from typing import Optional
-
-import pydantic
+from pydantic_settings import BaseSettings
 
 
-class MosaicSettings(pydantic.BaseSettings):
+class MosaicSettings(BaseSettings):
     """Application settings"""
 
-    backend: Optional[str]
-    host: Optional[str]
+    backend: str = "file://"
+    host: str = "/tmp"
     format: str = ".json.gz"  # format will be ignored for dynamodb backend
 
     class Config:
@@ -17,6 +15,3 @@ class MosaicSettings(pydantic.BaseSettings):
 
         env_prefix = "MOSAIC_"
         env_file = ".env"
-
-
-mosaic_config = MosaicSettings()
