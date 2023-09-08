@@ -1,3 +1,7 @@
+"""
+This code was pulled from stac_pydantic:
+https://github.com/stac-utils/stac-pydantic/blob/master/stac_pydantic/api/extensions/fields.py
+"""
 from typing import Dict, Optional, Set
 
 from pydantic import BaseModel

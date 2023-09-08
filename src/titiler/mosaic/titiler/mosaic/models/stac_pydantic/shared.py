@@ -1,3 +1,7 @@
+"""
+This code was pulled from stac_pydantic:
+https://github.com/stac-utils/stac-pydantic/blob/master/stac_pydantic/shared.py
+"""
 from datetime import datetime
 from enum import Enum, auto
 from typing import List, Optional, Tuple, Union
@@ -55,6 +59,10 @@ class AssetRoles(str, AutoValueEnum):
 
 
 class ProviderRoles(str, AutoValueEnum):
+    """
+    Holds the Roles set for the Provider
+    """
+
     licensor = auto()
     producer = auto()
     processor = auto()
@@ -91,6 +99,10 @@ class StacCommonMetadata(BaseModel):
     gsd: Optional[float] = Field(None, alias="gsd", gt=0)
 
     class Config:
+        """
+        A configuration that holds the json_encoders for the metadata
+        """
+
         json_encoders = {datetime: lambda v: v.strftime(DATETIME_RFC339)}
 
 
@@ -106,6 +118,10 @@ class Asset(StacCommonMetadata):
     roles: Optional[List[str]]
 
     class Config:
+        """
+        Configuration values for the shared asset
+        """
+
         allow_population_by_field_name = True
         use_enum_values = True
         extra = Extra.allow

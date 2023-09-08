@@ -1,5 +1,7 @@
-# copied from stac_pydantic
-
+"""
+This code was pulled from stac_pydantic:
+https://github.com/stac-utils/stac-pydantic/blob/master/stac_pydantic/api/search.py
+"""
 from datetime import datetime as dt
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
@@ -49,6 +51,9 @@ class Search(BaseModel):
 
     @property
     def start_date(self) -> Optional[dt]:
+        """
+        The starting bound of a temporal search
+        """
         values = (self.datetime or "").split("/")
         if len(values) == 1:
             return None
@@ -58,6 +63,9 @@ class Search(BaseModel):
 
     @property
     def end_date(self) -> Optional[dt]:
+        """
+        The ending bound of a temporal search
+        """
         values = (self.datetime or "").split("/")
         if len(values) == 1:
             return parse_datetime(values[0])
@@ -71,12 +79,18 @@ class Search(BaseModel):
         v: Intersection,
         values: Dict[str, Any],
     ) -> Intersection:
+        """
+        Checks whether the provided bounding box values exist
+        """
         if v and values["bbox"] is not None:
             raise ValueError("intersects and bbox parameters are mutually exclusive")
         return v
 
     @validator("bbox")
     def validate_bbox(cls, v: BBox) -> BBox:
+        """
+        Checks whether the provided bounding box values are valid
+        """
         if v:
             # Validate order
             if len(v) == 4:
@@ -108,6 +122,9 @@ class Search(BaseModel):
 
     @validator("datetime")
     def validate_datetime(cls, v: str) -> str:
+        """
+        Checks whether the datetime value is valid
+        """
         if "/" in v:
             values = v.split("/")
         else:

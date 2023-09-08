@@ -1,3 +1,7 @@
+"""
+This code was pulled from stac_pydantic:
+https://github.com/stac-utils/stac-pydantic/blob/master/stac_pydantic/api/extensions/query.py
+"""
 from enum import auto
 from types import DynamicClassAttribute
 from typing import Any, Callable
