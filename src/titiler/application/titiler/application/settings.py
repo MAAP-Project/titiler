@@ -9,7 +9,7 @@ class ApiSettings(BaseSettings):
 
     name: str = "TiTiler"
     cors_origins: str = "*"
-    cors_allow_methods: str = "GET"
+    cors_allow_methods: str = "GET,POST,OPTIONS"
     cachecontrol: str = "public, max-age=3600"
     root_path: str = ""
     debug: bool = False
