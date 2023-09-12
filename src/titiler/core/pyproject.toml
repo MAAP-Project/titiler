@@ -46,7 +46,7 @@ test = [
     "pytest",
     "pytest-cov",
     "pytest-asyncio",
-    "httpx",
+    "httpx==0.24.1", # pinned due to test failures introduced by 0.25.0
 ]
 
 [project.urls]
