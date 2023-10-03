@@ -1034,7 +1034,6 @@ class MosaicTilerFactory(BaseTilerFactory):
                             format,
                             layer_params,
                             dataset_params,
-                            render_params,
                             colormap,
                             pixel_selection,
                             reader_params,
@@ -1164,7 +1163,6 @@ class MosaicTilerFactory(BaseTilerFactory):
             format: ImageType,
             layer_params,
             dataset_params,
-            render_params,
             colormap,
             pixel_selection: PixelSelectionMethod,
             reader_params,
@@ -1191,6 +1189,8 @@ class MosaicTilerFactory(BaseTilerFactory):
                         pixel_selection,
                         threads=threads,
                         tilesize=tilesize,
+                        **layer_params,
+                        **dataset_params,
                     )
             timings.append(("dataread", round((t.elapsed - mosaic_read) * 1000, 2)))
 
