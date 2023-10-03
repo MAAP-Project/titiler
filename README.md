@@ -21,9 +21,9 @@ TiTiler code.
 
 The upstream TiTiler documentation can be found [here](https://devseed.com/titiler/).
 
-## Installation
+## Installation and Running for Development
 
-To install from sources and run for development:
+To install from sources:
 
 ```shell
 git clone https://github.com/element84/titiler-mosaicjson.git
@@ -33,8 +33,67 @@ python -m pip install -U pip
 python -m pip install -e src/titiler/core -e src/titiler/extensions -e src/titiler/mosaic -e src/titiler/application
 python -m pip install uvicorn
 
+```
+
+Configure AWS credentials for the account that will be used for DynamoDB backend storage.
+Depending on the permissions for those credentials, it may be necessary to explicitly grant
+permission to access the data in any requestor pays buckets, e.g.:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::naip-analytic/*"
+        }
+    ]
+}
+```
+
+Create a DynamoDB table to use for mosaicjson storage, e.g., `my-username-mosaicjson`.
+
+Set the following env vars. The MOSAIC_HOST will be the region and the name of this table.
+
+```shell
+export AWS_REQUEST_PAYER=requester
+export MOSAIC_BACKEND=dynamodb://
+export MOSAIC_HOST=us-west-2/my-username-mosaicjson
+```
+
+Then run the server:
+
+```shell
 uvicorn titiler.application.main:app --reload
 ```
+
+This should start a server running at <http://127.0.0.1:8000>
+
+To create a mosaic, run:
+
+```shell
+curl -X "POST" "http://127.0.0.1:8000/mosaicjson/mosaics" \
+     -H 'Content-Type: application/vnd.titiler.stac-api-query+json' \
+     -d $'{
+  "stac_api_root": "https://earth-search.aws.element84.com/v1",
+  "max_items": 100,
+  "bbox": [
+    -113.56481552124025,
+    35.13093004178304,
+    -113.43503952026369,
+    35.15802107388074
+  ],
+  "datetime": "2020-12-31T00:00:00Z/2022-12-31T23:59:59.999Z",
+  "collections": [
+    "naip"
+  ],
+  "asset_name": "image"
+}'
+```
+
+Alternatively, configure the FilmDrop UI `SCENE_TILER_URL` and `MOSAIC_TILER_URL` variables
+to be `http://127.0.0.1:8000`
 
 ## Contribution & Development
 
