@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum, auto
 from typing import List, Optional, Tuple, Union
 
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Field
 
 from titiler.mosaic.models.stac_pydantic.utils import AutoValueEnum
 
