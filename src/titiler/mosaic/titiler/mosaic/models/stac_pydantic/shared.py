@@ -124,4 +124,4 @@ class Asset(StacCommonMetadata):
 
         populate_by_name = True
         use_enum_values = True
-        extra = 'allow'
+        extra = "allow"
