@@ -1034,6 +1034,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                             format,
                             layer_params,
                             dataset_params,
+                            render_params,
                             colormap,
                             pixel_selection,
                             reader_params,
@@ -1163,6 +1164,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             format: ImageType,
             layer_params,
             dataset_params,
+            render_params,
             colormap,
             pixel_selection: PixelSelectionMethod,
             reader_params,
@@ -1206,6 +1208,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                     img_format=format.driver,
                     colormap=colormap,
                     **format.profile,
+                    **render_params,
                 )
             timings.append(("format", round(t.elapsed * 1000, 2)))
 
