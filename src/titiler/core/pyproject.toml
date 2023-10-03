@@ -33,6 +33,7 @@ dependencies = [
     "geojson-pydantic>=1.0,<2.0",
     "jinja2>=2.11.2,<4.0.0",
     "numpy",
+    "pystac<=1.8.3",
     "pydantic~=2.0",
     "rasterio",
     "rio-tiler>=6.0,<7.0",
