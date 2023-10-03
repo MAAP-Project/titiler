@@ -30,6 +30,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "mercantile",
+    "pystac<=1.8.3",
     "pystac-client~=0.6.0",
     "morecantile>=5.0,<6.0",
     "titiler.core==0.14.0",
