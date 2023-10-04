@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 0.14.0-1.0.4 (2023-10-04)
 
 - Mosaic: For float-valued data (e.g., COP DEM), rescale before tiling.
 - Mosaic: Re-added parameters to mosaic render_tile that were previously removed inadvertently, which broke multi-band raster tiling.
