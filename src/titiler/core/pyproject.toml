@@ -33,7 +33,7 @@ dependencies = [
     "geojson-pydantic>=1.0,<2.0",
     "jinja2>=2.11.2,<4.0.0",
     "numpy",
-    "pystac<=1.8.3",
+    "pystac~=1.8.4",
     "pydantic~=2.0",
     "rasterio",
     "rio-tiler>=6.0,<7.0",
@@ -48,6 +48,7 @@ test = [
     "pytest-cov",
     "pytest-asyncio",
     "httpx==0.24.1", # pinned due to test failures introduced by 0.25.0
+    "pystac[validation]~=1.8.4",
 ]
 
 [project.urls]
