@@ -1191,6 +1191,8 @@ class MosaicTilerFactory(BaseTilerFactory):
                         pixel_selection,
                         threads=threads,
                         tilesize=tilesize,
+                        **layer_params,
+                        **dataset_params,
                     )
             timings.append(("dataread", round((t.elapsed - mosaic_read) * 1000, 2)))
 
@@ -1206,6 +1208,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                     img_format=format.driver,
                     colormap=colormap,
                     **format.profile,
+                    **render_params,
                 )
             timings.append(("format", round(t.elapsed * 1000, 2)))
 
