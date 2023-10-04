@@ -1017,6 +1017,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             ),
             env=Depends(self.environment_dependency),
             reader_params=Depends(self.reader_dependency),
+            rescale=Depends(self.rescale_dependency),
         ):
             """Create map tile from a mosaic."""
 
@@ -1038,6 +1039,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                             colormap,
                             pixel_selection,
                             reader_params,
+                            rescale,
                         ),
                         30,  # todo: ???
                     )
@@ -1168,6 +1170,7 @@ class MosaicTilerFactory(BaseTilerFactory):
             colormap,
             pixel_selection: PixelSelectionMethod,
             reader_params,
+            rescale,
         ) -> Tuple[bytes, Any, ImageType, List[Tuple[str, float]]]:
             """Create map tile from a COG."""
             timings = []
@@ -1202,6 +1205,9 @@ class MosaicTilerFactory(BaseTilerFactory):
             with Timer() as t:
                 image = data.post_process()
             timings.append(("postprocess", round(t.elapsed * 1000, 2)))
+
+            if rescale:
+                image.rescale(rescale)
 
             with Timer() as t:
                 content = image.render(
