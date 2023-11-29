@@ -1,0 +1,888 @@
+{
+	"info": {
+		"_postman_id": "781ba47c-39d7-4b76-85a3-08fcabdb8fc8",
+		"name": "TiTIler Smoke Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2007240"
+	},
+	"item": [
+		{
+			"name": "Scene: Sentinel-2 L2A",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{combined_base_url}}/stac/tiles/8/73/100@2x.png?url=https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_18SUF_20230813_0_L2A&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+12+0.35",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"stac",
+						"tiles",
+						"8",
+						"73",
+						"100@2x.png"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2A_18SUF_20230813_0_L2A"
+						},
+						{
+							"key": "assets",
+							"value": "red"
+						},
+						{
+							"key": "assets",
+							"value": "green"
+						},
+						{
+							"key": "assets",
+							"value": "blue"
+						},
+						{
+							"key": "color_formula",
+							"value": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+12+0.35"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene: Sentinel-1 GRD",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{combined_base_url}}/stac/tiles/9/147/200@1x.png?url=https://earth-search.aws.element84.com/v1/collections/sentinel-1-grd/items/S1A_IW_GRDH_1SDV_20230924T230648_20230924T230713_050476_06143C&assets=vv&rescale=0,250&colormap_name=plasma",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"stac",
+						"tiles",
+						"9",
+						"147",
+						"200@1x.png"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://earth-search.aws.element84.com/v1/collections/sentinel-1-grd/items/S1A_IW_GRDH_1SDV_20230924T230648_20230924T230713_050476_06143C"
+						},
+						{
+							"key": "assets",
+							"value": "vv"
+						},
+						{
+							"key": "rescale",
+							"value": "0,250"
+						},
+						{
+							"key": "colormap_name",
+							"value": "plasma"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene: NAIP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{combined_base_url}}/stac/tiles/13/2372/3167@1x.png?url=https://earth-search.aws.element84.com/v1/collections/naip/items/va_m_3707519_nw_18_060_20211017&assets=image&asset_bidx=image|1,2,3",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"stac",
+						"tiles",
+						"13",
+						"2372",
+						"3167@1x.png"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://earth-search.aws.element84.com/v1/collections/naip/items/va_m_3707519_nw_18_060_20211017"
+						},
+						{
+							"key": "assets",
+							"value": "image"
+						},
+						{
+							"key": "asset_bidx",
+							"value": "image|1,2,3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene: Landsat 8 L2-C2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{combined_base_url}}/stac/tiles/7/35/50@2x.png?url=https://earth-search.aws.element84.com/v1/collections/landsat-c2-l2/items/LE07_L2SP_017035_20220610_02_T1&assets=red&assets=green&assets=blue&color_formula=Gamma+RGB+1.7+Saturation+1.7+Sigmoidal+RGB+15+0.35",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"stac",
+						"tiles",
+						"7",
+						"35",
+						"50@2x.png"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://earth-search.aws.element84.com/v1/collections/landsat-c2-l2/items/LE07_L2SP_017035_20220610_02_T1"
+						},
+						{
+							"key": "assets",
+							"value": "red"
+						},
+						{
+							"key": "assets",
+							"value": "green"
+						},
+						{
+							"key": "assets",
+							"value": "blue"
+						},
+						{
+							"key": "color_formula",
+							"value": "Gamma+RGB+1.7+Saturation+1.7+Sigmoidal+RGB+15+0.35"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene: Copernicus DEM GLO-90",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{combined_base_url}}/stac/tiles/7/33/50@2x.png?url=https://earth-search.aws.element84.com/v1/collections/cop-dem-glo-90/items/Copernicus_DSM_COG_30_N36_00_W085_00_DEM&assets=data&rescale=-1000,4000&colormap_name=terrain",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"stac",
+						"tiles",
+						"7",
+						"33",
+						"50@2x.png"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://earth-search.aws.element84.com/v1/collections/cop-dem-glo-90/items/Copernicus_DSM_COG_30_N36_00_W085_00_DEM"
+						},
+						{
+							"key": "assets",
+							"value": "data"
+						},
+						{
+							"key": "rescale",
+							"value": "-1000,4000"
+						},
+						{
+							"key": "colormap_name",
+							"value": "terrain"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Scene: Copernicus DEM GLO-30",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{combined_base_url}}/stac/tiles/7/34/50@2x.png?url=https://earth-search.aws.element84.com/v1/collections/cop-dem-glo-30/items/Copernicus_DSM_COG_10_N35_00_W082_00_DEM&assets=data&rescale=-1000,4000&colormap_name=terrain",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"stac",
+						"tiles",
+						"7",
+						"34",
+						"50@2x.png"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "https://earth-search.aws.element84.com/v1/collections/cop-dem-glo-30/items/Copernicus_DSM_COG_10_N35_00_W082_00_DEM"
+						},
+						{
+							"key": "assets",
+							"value": "data"
+						},
+						{
+							"key": "rescale",
+							"value": "-1000,4000"
+						},
+						{
+							"key": "colormap_name",
+							"value": "terrain"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: Sentinel-2 L2A",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var url = jsonData.links[0].href + \"/tiles/8/73/100.png?\";",
+							"",
+							"pm.sendRequest({",
+							"    url: url,",
+							"    method: 'GET',",
+							"}, function (err, res) {",
+							"    pm.test(\"Status code is 200\", function() {",
+							"        pm.expect(res.code).to.eql(200);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9,es;q=0.8",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.titiler.stac-api-query+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stac_api_root\": \"https://earth-search.aws.element84.com/v1\",\n    \"asset_name\": \"visual\",\n    \"collections\": [\n        \"sentinel-2-l2a\"\n    ],\n    \"datetime\": \"2023-08-29T00:00:00Z/2023-09-12T23:59:59.999Z\",\n    \"max_items\": 100,\n    \"bbox\": [\n        -82.05688476562501,\n        34.42956713470528,\n        -72.60864257812501,\n        39.457402514270825\n    ],\n    \"query\": {\n        \"eo:cloud_cover\": {\n            \"gte\": 0,\n            \"lte\": 30\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: Sentinel-1 GRD",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var url = jsonData.links[0].href + \"/tiles/8/62/106.png?rescale=0,250&colormap_name=plasma\";",
+							"",
+							"pm.sendRequest({",
+							"    url: url,",
+							"    method: 'GET',",
+							"}, function (err, res) {",
+							"    pm.test(\"Status code is 200\", function() {",
+							"        pm.expect(res.code).to.eql(200);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9,es;q=0.8",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.titiler.stac-api-query+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stac_api_root\": \"https://earth-search.aws.element84.com/v1\",\n    \"asset_name\": \"vv\",\n    \"collections\": [\n        \"sentinel-1-grd\"\n    ],\n    \"datetime\": \"2023-08-29T00:00:00Z/2023-09-12T23:59:59.999Z\",\n    \"max_items\": 100,\n    \"bbox\": [\n        -94.3567730583507,\n        27.012653665901546,\n        -84.9085308708507,\n        32.47502185458733\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: NAIP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var url = jsonData.links[0].href + \"/tiles/10/286/404.png?bidx=1&bidx=2&bidx=3\";",
+							"",
+							"pm.sendRequest({",
+							"    url: url,",
+							"    method: 'GET',",
+							"}, function (err, res) {",
+							"    pm.test(\"Status code is 200\", function() {",
+							"        pm.expect(res.code).to.eql(200);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9,es;q=0.8",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.titiler.stac-api-query+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stac_api_root\": \"https://earth-search.aws.element84.com/v1\",\n    \"asset_name\": \"image\",\n    \"collections\": [\n        \"naip\"\n    ],\n    \"datetime\": \"2009-04-21T00:00:00Z/2021-04-22T23:59:59.999Z\",\n    \"max_items\": 100,\n    \"bbox\": [\n        -80.79614040390037,\n        34.80015741577336,\n        -78.171781273041,\n        36.20427775875908\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: Landsat 8 L2-C2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var url = jsonData.links[0].href + \"/tiles/11/571/789.png?color_formula=Gamma+R+1.7+Sigmoidal+R+15+0.35\";",
+							"",
+							"pm.sendRequest({",
+							"    url: url,",
+							"    method: 'GET',",
+							"}, function (err, res) {",
+							"    pm.test(\"Status code is 200\", function() {",
+							"        pm.expect(res.code).to.eql(200);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9,es;q=0.8",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.titiler.stac-api-query+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stac_api_root\": \"https://earth-search.aws.element84.com/v1\",\n    \"asset_name\": \"red\",\n    \"collections\": [\n        \"landsat-c2-l2\"\n    ],\n    \"datetime\": \"2023-09-21T00:00:00Z/2023-10-05T23:59:59.999Z\",\n    \"max_items\": 100,\n    \"bbox\": [\n        -79.97085571289062,\n        37.58158917213053,\n        -78.65867614746095,\n        38.281852079168004\n    ],\n    \"query\": {\n        \"eo:cloud_cover\": {\n            \"gte\": 0,\n            \"lte\": 30\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: Copernicus DEM GLO-90",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var url = jsonData.links[0].href + \"/tiles/10/284/403.png?rescale=-1000,4000&colormap_name=terrain\";",
+							"",
+							"pm.sendRequest({",
+							"    url: url,",
+							"    method: 'GET',",
+							"}, function (err, res) {",
+							"    pm.test(\"Status code is 200\", function() {",
+							"        pm.expect(res.code).to.eql(200);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9,es;q=0.8",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.titiler.stac-api-query+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stac_api_root\": \"https://earth-search.aws.element84.com/v1\",\n    \"asset_name\": \"data\",\n    \"collections\": [\n        \"cop-dem-glo-90\"\n    ],\n    \"datetime\": \"2021-04-22T00:00:00Z/2021-04-22T23:59:59.999Z\",\n    \"max_items\": 100,\n    \"bbox\": [\n        -80.79614040390037,\n        34.80015741577336,\n        -78.171781273041,\n        36.20427775875908\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: Copernicus DEM GLO-30",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"var url = jsonData.links[0].href + \"/tiles/10/285/403.png?rescale=-1000,4000&colormap_name=terrain\";",
+							"",
+							"pm.sendRequest({",
+							"    url: url,",
+							"    method: 'GET',",
+							"}, function (err, res) {",
+							"    pm.test(\"Status code is 200\", function() {",
+							"        pm.expect(res.code).to.eql(200);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9,es;q=0.8",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.titiler.stac-api-query+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stac_api_root\": \"https://earth-search.aws.element84.com/v1\",\n    \"asset_name\": \"data\",\n    \"collections\": [\n        \"cop-dem-glo-30\"\n    ],\n    \"datetime\": \"2021-04-22T00:00:00Z/2021-04-22T23:59:59.999Z\",\n    \"max_items\": 100,\n    \"bbox\": [\n        -80.79614040390037,\n        34.80015741577336,\n        -78.171781273041,\n        36.20427775875908\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mosaic: CORS",
+			"request": {
+				"method": "OPTIONS",
+				"header": [
+					{
+						"key": "authority",
+						"value": "mosaic-titiler.dev.demo.filmdrop.io"
+					},
+					{
+						"key": "path",
+						"value": "/mosaicjson/mosaics"
+					},
+					{
+						"key": "scheme",
+						"value": "https"
+					},
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en-US,en;q=0.9"
+					},
+					{
+						"key": "access-control-request-headers",
+						"value": "authorization"
+					},
+					{
+						"key": "access-control-request-method",
+						"value": "POST"
+					},
+					{
+						"key": "cache-control",
+						"value": "no-cache"
+					},
+					{
+						"key": "origin",
+						"value": "https://console.dev.demo.filmdrop.io"
+					},
+					{
+						"key": "pragma",
+						"value": "no-cache"
+					},
+					{
+						"key": "referer",
+						"value": "https://console.dev.demo.filmdrop.io/"
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
+					}
+				],
+				"url": {
+					"raw": "{{combined_base_url}}/mosaicjson/mosaics",
+					"host": [
+						"{{combined_base_url}}"
+					],
+					"path": [
+						"mosaicjson",
+						"mosaics"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "combined_base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}
