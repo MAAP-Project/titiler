@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.14.0-1.0.5 (2024-05-29)
+
+- Mosaic: Added MOSAIC_TILE_TIMEOUT to define maximum rendering time for a single tile.
+
 ## 0.14.0-1.0.4 (2023-10-04)
 
 - Mosaic: For float-valued data (e.g., COP DEM), rescale before tiling.

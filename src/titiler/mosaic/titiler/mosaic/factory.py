@@ -1041,7 +1041,7 @@ class MosaicTilerFactory(BaseTilerFactory):
                             reader_params,
                             rescale,
                         ),
-                        30,  # todo: ???
+                        int(os.getenv("MOSAIC_TILE_TIMEOUT", 30)),
                     )
             except asyncio.TimeoutError as e:
                 raise HTTPException(
