@@ -24,19 +24,32 @@ python -m pip install \
   ./src/titiler/mosaic \
   ./src/titiler/application \
   mangum==0.17.0 \
-  rasterio \
-  "morecantile>=5.0,<6.0" \
-  "rio-tiler>=6.0,<7.0" \
-  "cogeo-mosaic>=7.0,<8.0" \
+  rasterio==1.3.10 \
+  morecantile==5.3.0 \
+  rio-tiler==6.6.1 \
+  cogeo-mosaic==7.1.0 \
   markupsafe==2.0.1 \
-  boto3==1.28.27
+  boto3==1.28.27 \
+  botocore==1.31.59
+# pinning boto3 and botocore above even though we're going to remove them to
+# prevent pulling in different transitive dependencies
 
 cd lambda
 
 echo "cleaning up..."
-find . -type d -a -name '*.dist-info' -print0 | xargs -0 rm -rf
+
+# remove boto3 and botocore, because otherwise the lambda zip is too large
+# after exploding
+find . -type d -a -name 'boto3' -print0 | xargs -0 rm -rf
+find . -type d -a -name 'botocore' -print0 | xargs -0 rm -rf
+
+# remove cache and test files
 find . -type d -a -name '__pycache__' -print0 | xargs -0 rm -rf
 find . -type d -a -name 'tests' -print0 | xargs -0 rm -rf
+
+# DON'T remove dist-info, because email-validator relies on it for loading
+# its version
+# find . -type d -a -name '*.dist-info' -print0 | xargs -0 rm -rf
 
 echo "copying handler..."
 cp ../deployment/aws/lambda/handler.py .

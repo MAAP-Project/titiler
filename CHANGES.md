@@ -1,8 +1,9 @@
 # Release Notes
 
-## 0.14.0-1.0.5 (2024-05-29)
+## 0.14.0-1.0.5 (2024-05-31)
 
 - Mosaic: Added MOSAIC_TILE_TIMEOUT to define maximum rendering time for a single tile.
+- Reworked lambda zip as it was too large to pin dependencies and remove boto3 and botocore.
 
 ## 0.14.0-1.0.4 (2023-10-04)
 
