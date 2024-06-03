@@ -1,10 +1,12 @@
 """Test TiTiler mosaic Factory."""
 
+import hashlib
 import os
 import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
 from io import BytesIO
+from pathlib import Path
 
 import morecantile
 import numpy
@@ -13,7 +15,7 @@ from cogeo_mosaic.errors import NoAssetFoundError
 from cogeo_mosaic.mosaic import MosaicJSON
 from fastapi import FastAPI
 from morecantile.defaults import TileMatrixSets
-from pytest import raises
+from pytest import fail, raises
 from rio_tiler.mosaic.methods import PixelSelectionMethod
 from starlette.testclient import TestClient
 
@@ -484,44 +486,96 @@ def test_mosaics_create():
     )
     assert r.status_code == 201
 
-    def test_mosaics_create_errors():
-        """Test mosaicjson functionality."""
 
-        mosaic = MosaicTilerFactory(
-            optional_headers=[OptionalHeader.server_timing, OptionalHeader.x_assets],
-            router_prefix="mosaic",
+def test_mosaics_create_errors():
+    """Test mosaicjson functionality."""
+
+    mosaic = MosaicTilerFactory(
+        optional_headers=[OptionalHeader.server_timing, OptionalHeader.x_assets],
+        router_prefix="mosaic",
+    )
+
+    app = FastAPI()
+    app.include_router(mosaic.router, prefix="/mosaic")
+    client = TestClient(app)
+
+    # invalid MosaicJSON
+    r = client.post(
+        url="/mosaic/mosaics",
+        headers={"Content-Type": "application/json"},
+        json={},
+    )
+    assert r.status_code == 400
+
+    # too many urls
+    r = client.post(
+        url="/mosaic/mosaics",
+        headers={"Content-Type": "application/vnd.titiler.urls+json"},
+        json={"urls": [{str(x): str(x)} for x in range(101)]},
+    )
+    assert r.status_code == 400
+
+    # too many results from STAC query
+    r = client.post(
+        url="/mosaic/mosaics",
+        headers={"Content-Type": "application/vnd.titiler.stac-api-query+json"},
+        json={
+            "stac_api_root": "https://earth-search.aws.element84.com/v0",
+            "collections": ["sentinel-s2-l2a-cogs"],
+        },
+    )
+    assert r.status_code == 400
+
+
+def test_mosaic_generate_tiles():
+    mosaic = MosaicTilerFactory(
+        optional_headers=[OptionalHeader.x_assets],
+        router_prefix="mosaic",
+    )
+
+    app = FastAPI()
+    app.include_router(mosaic.router, prefix="/mosaic")
+    client = TestClient(app)
+
+    mosaicjson_data = Path(os.path.join(DATA_DIR, "io_global_2017.json")).read_text()
+
+    r = client.post(
+        url="/mosaic/mosaics",
+        headers={"Content-Type": "application/vnd.titiler.mosaicjson+json"},
+        data=mosaicjson_data,
+    )
+    assert r.status_code == 201
+
+    location_header_url = r.headers["location"]
+    r = client.get(url=location_header_url)
+    tiles_link = _get_link_by_rel(r.json(), "tiles")
+    # tiles_link ends with `{z}/{x}/{y}`
+    first_half_hash_input = tiles_link.split("mosaic/mosaics/")[1]
+    COLORMAP = "%7B%220%22%3A%20%22%23000000%22%2C%20%221%22%3A%20%22%23419bdf%22%2C%20%222%22%3A%20%22%23397d49%22%2C%20%223%22%3A%20%22%23000000%22%2C%20%224%22%3A%20%22%237a87c6%22%2C%20%225%22%3A%20%22%23e49635%22%2C%20%226%22%3A%20%22%23000000%22%2C%20%227%22%3A%20%22%23c4281b%22%2C%20%228%22%3A%20%22%23a59b8f%22%2C%20%229%22%3A%20%22%23a8ebff%22%2C%20%2210%22%3A%20%22%23616161%22%2C%20%2211%22%3A%20%22%23e3e2c3%22%7D"
+    tiles_link_suffix = f"@2x.png?assets=supercell&colormap={COLORMAP}"
+
+    mosaic_hash = hashlib.sha256(
+        f"{first_half_hash_input}{tiles_link_suffix}".encode()
+    ).hexdigest()
+
+    if not Path(mosaic_hash).exists():
+
+        z = "0"
+        x = "0"
+        y = "0"
+        tile_url = (
+            tiles_link.replace("{z}", z).replace("{x}", x).replace("{y}", y)
+            + tiles_link_suffix
         )
 
-        app = FastAPI()
-        app.include_router(mosaic.router, prefix="/mosaic")
-        client = TestClient(app)
-
-        # invalid MosaicJSON
-        r = client.post(
-            url="/mosaic/mosaics",
-            headers={"Content-Type": "application/json"},
-            json={},
-        )
-        assert r.status_code == 400
-
-        # too many urls
-        r = client.post(
-            url="/mosaic/mosaics",
-            headers={"Content-Type": "application/vnd.titiler.urls+json"},
-            json={"urls": [{str(x): str(x)} for x in range(101)]},
-        )
-        assert r.status_code == 400
-
-        # too many results from STAC query
-        r = client.post(
-            url="/mosaic/mosaics",
-            headers={"Content-Type": "application/vnd.titiler.stac-api-query+json"},
-            json={
-                "stac_api_root": "https://earth-search.aws.element84.com/v0",
-                "collections": ["sentinel-s2-l2a-cogs"],
-            },
-        )
-        assert r.status_code == 400
+        r = client.get(url=tile_url)
+        match r.status_code:  # noqa: E999
+            case 200:
+                Path(os.path.join(DATA_DIR, mosaic_hash)).write_bytes(r.content)
+            case 404:
+                open(os.path.join(DATA_DIR, mosaic_hash), "w+")
+            case _:
+                fail(f"Error: {tile_url} => {r.status_code}: {r.text}")
 
 
 @dataclass
